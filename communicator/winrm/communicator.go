@@ -34,6 +34,10 @@ func New(s *terraform.InstanceState) (*Communicator, error) {
 		return nil, err
 	}
 
+	return GetCommunicator(connInfo)
+}
+
+func GetCommunicator(connInfo *connectionInfo)(*Communicator, error) {
 	endpoint := &winrm.Endpoint{
 		Host:     connInfo.Host,
 		Port:     connInfo.Port,

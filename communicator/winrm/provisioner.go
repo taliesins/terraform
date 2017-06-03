@@ -43,22 +43,7 @@ type connectionInfo struct {
 	TimeoutVal time.Duration `mapstructure:"-"`
 }
 
-// parseConnectionInfo is used to convert the ConnInfo of the InstanceState into
-// a ConnectionInfo struct
-func parseConnectionInfo(s *terraform.InstanceState) (*connectionInfo, error) {
-	connInfo := &connectionInfo{}
-	decConf := &mapstructure.DecoderConfig{
-		WeaklyTypedInput: true,
-		Result:           connInfo,
-	}
-	dec, err := mapstructure.NewDecoder(decConf)
-	if err != nil {
-		return nil, err
-	}
-	if err := dec.Decode(s.Ephemeral.ConnInfo); err != nil {
-		return nil, err
-	}
-
+func validateConnectionInfo(connInfo *connectionInfo)(*connectionInfo, error) {
 	// Check on script paths which point to the default Windows TEMP folder because files
 	// which are put in there very early in the boot process could get cleaned/deleted
 	// before you had the change to execute them.
@@ -91,6 +76,40 @@ func parseConnectionInfo(s *terraform.InstanceState) (*connectionInfo, error) {
 	}
 
 	return connInfo, nil
+}
+
+func GetConnectionInfo(host string, port int, user string, password string, HTTPS bool, insecure bool, timeout string, cacert *[]byte, scriptPath string) ( *connectionInfo, error)  {
+	connInfo := &connectionInfo{}
+	connInfo.Host = host
+	connInfo.Port = port
+	connInfo.User = user
+	connInfo.Password = password
+	connInfo.HTTPS = HTTPS
+	connInfo.Insecure = insecure
+	connInfo.Timeout = timeout
+	connInfo.CACert = cacert
+	connInfo.ScriptPath = scriptPath
+
+	return validateConnectionInfo(connInfo)
+}
+
+// parseConnectionInfo is used to convert the ConnInfo of the InstanceState into
+// a ConnectionInfo struct
+func parseConnectionInfo(s *terraform.InstanceState) (*connectionInfo, error) {
+	connInfo := &connectionInfo{}
+	decConf := &mapstructure.DecoderConfig{
+		WeaklyTypedInput: true,
+		Result:           connInfo,
+	}
+	dec, err := mapstructure.NewDecoder(decConf)
+	if err != nil {
+		return nil, err
+	}
+	if err := dec.Decode(s.Ephemeral.ConnInfo); err != nil {
+		return nil, err
+	}
+
+	return validateConnectionInfo(connInfo)
 }
 
 // safeDuration returns either the parsed duration or a default value
