@@ -94,6 +94,12 @@ type vmSwitch struct {
 	BandwidthReservationMode int
 	SwitchType	int
 	NetAdapterInterfaceDescriptions []string
+	NetAdapterNames []string
+	DefaultFlowMinimumBandwidthAbsolute int
+	DefaultFlowMinimumBandwidthWeight int
+	DefaultQueueVmmqEnabled bool
+	DefaultQueueVmmqQueuePairs int
+	DefaultQueueVrssEnabled bool
 }
 
 type createVMSwitchArgs struct {
@@ -104,12 +110,20 @@ var createVMSwitchTemplate = template.Must(template.New("CreateVMSwitch").Parse(
 $vmSwitch = '{{.VmSwitchJson}}' | ConvertFrom-Json
 $minimumBandwidthMode = [Microsoft.HyperV.PowerShell.VMSwitchBandwidthMode]$vmSwitch.BandwidthReservationMode
 $switchType = [Microsoft.HyperV.PowerShell.VMSwitchType]$vmSwitch.SwitchType
+$NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
+$NetAdapterNames = @($vmSwitch.$NetAdapterNames)
+#when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
 
-if ($vmSwitch.NetAdapterInterfaceDescriptions) {
-	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions
+if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
+	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -NetAdapterInterfaceDescription $NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames
 } else {
-	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -SwitchType $switchType
+	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -SwitchType $switchType
+
+	#not used unless interface is specified
+	#-AllowManagementOS $vmSwitch.AllowManagementOS
 }
+
+Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 `))
 
 func (c *client) CreateVMSwitch(name string,
@@ -120,7 +134,14 @@ func (c *client) CreateVMSwitch(name string,
 	packetDirectEnabled bool,
 	bandwidthReservationMode int,
 	switchType int,
-	netAdapterInterfaceDescriptions []string) (err error) {
+	netAdapterInterfaceDescriptions []string,
+	netAdapterNames []string,
+	defaultFlowMinimumBandwidthAbsolute int,
+	defaultFlowMinimumBandwidthWeight int,
+	defaultQueueVmmqEnabled bool,
+	defaultQueueVmmqQueuePairs int,
+	defaultQueueVrssEnabled bool,
+) (err error) {
 
 	vmSwitchJson, err := json.Marshal(vmSwitch{
 		Name:name,
@@ -132,6 +153,12 @@ func (c *client) CreateVMSwitch(name string,
 		BandwidthReservationMode:bandwidthReservationMode,
 		SwitchType:switchType,
 		NetAdapterInterfaceDescriptions:netAdapterInterfaceDescriptions,
+		NetAdapterNames:netAdapterNames,
+		DefaultFlowMinimumBandwidthAbsolute:defaultFlowMinimumBandwidthAbsolute,
+		DefaultFlowMinimumBandwidthWeight:defaultFlowMinimumBandwidthWeight,
+		DefaultQueueVmmqEnabled:defaultQueueVmmqEnabled,
+		DefaultQueueVmmqQueuePairs:defaultQueueVmmqQueuePairs,
+		DefaultQueueVrssEnabled:defaultQueueVrssEnabled,
 	})
 
 	err = c.runFireAndForgetScript(createVMSwitchTemplate, createVMSwitchArgs{
@@ -146,7 +173,7 @@ type getVMSwitchArgs struct {
 }
 
 var getVMSwitchTemplate = template.Must(template.New("GetVMSwitch").Parse(`
-(Get-VMSwitch -name '{{.SwitchName}}') | %{ @{Name=$_.Name;Notes=$_.Notes;AllowManagementOS=$_.AllowManagementOS;EmbeddedTeamingEnabled=$_.EmbeddedTeamingEnabled;IovEnabled=$_.IovEnabled;PacketDirectEnabled=$_.PacketDirectEnabled;BandwidthReservationMode=$_.BandwidthReservationMode;SwitchType=$_.SwitchType;NetAdapterInterfaceDescriptions=$_.NetAdapterInterfaceDescriptions}} | ConvertTo-Json
+(Get-VMSwitch -name '{{.SwitchName}}') | %{ @{Name=$_.Name;Notes=$_.Notes;AllowManagementOS=$_.AllowManagementOS;EmbeddedTeamingEnabled=$_.EmbeddedTeamingEnabled;IovEnabled=$_.IovEnabled;PacketDirectEnabled=$_.PacketDirectEnabled;BandwidthReservationMode=$_.BandwidthReservationMode;SwitchType=$_.SwitchType;NetAdapterInterfaceDescriptions=$_.NetAdapterInterfaceDescriptions;NetAdapterNames=@(Get-NetAdapter -InterfaceDescription $_.NetAdapterInterfaceDescriptions | %{$_.Name});DefaultFlowMinimumBandwidthAbsolute=$_.DefaultFlowMinimumBandwidthAbsolute;DefaultFlowMinimumBandwidthWeight=$_.DefaultFlowMinimumBandwidthWeight;DefaultQueueVmmqEnabled=$_.DefaultQueueVmmqEnabled;DefaultQueueVmmqQueuePairs=$_.DefaultQueueVmmqQueuePairs;DefaultQueueVrssEnabled=$_.DefaultQueueVrssEnabled;}} | ConvertTo-Json
 `))
 
 func (c *client) GetVMSwitch(name string) (result vmSwitch, err error) {
@@ -165,9 +192,12 @@ var updateVMSwitchTemplate = template.Must(template.New("UpdateVMSwitch").Parse(
 $vmSwitch = '{{.VmSwitchJson}}' | ConvertFrom-Json
 $minimumBandwidthMode = [Microsoft.HyperV.PowerShell.VMSwitchBandwidthMode]$vmSwitch.BandwidthReservationMode
 $switchType = [Microsoft.HyperV.PowerShell.VMSwitchType]$vmSwitch.SwitchType
+$NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
+$NetAdapterNames = @($vmSwitch.$NetAdapterNames)
+#when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
 
-if ($vmSwitch.NetAdapterInterfaceDescriptions) {
-	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions
+if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
+	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 
 	#Updates not supported on:
 	#-EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled
@@ -176,7 +206,7 @@ if ($vmSwitch.NetAdapterInterfaceDescriptions) {
 	#-MinimumBandwidthMode $minimumBandwidthMode
 
 } else {
-	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -SwitchType $switchType
+	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -SwitchType $switchType -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 
 	#Updates not supported on:
 	#-EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled
@@ -194,7 +224,14 @@ func (c *client) UpdateVMSwitch(name string,
 	//packetDirectEnabled bool,
 	//bandwidthReservationMode int,
 	switchType int,
-	netAdapterInterfaceDescriptions []string) (err error) {
+	netAdapterInterfaceDescriptions []string,
+	netAdapterNames []string,
+	defaultFlowMinimumBandwidthAbsolute int,
+	defaultFlowMinimumBandwidthWeight int,
+	defaultQueueVmmqEnabled bool,
+	defaultQueueVmmqQueuePairs int,
+	defaultQueueVrssEnabled bool,
+) (err error) {
 
 	vmSwitchJson, err := json.Marshal(vmSwitch{
 		Name:name,
@@ -206,6 +243,12 @@ func (c *client) UpdateVMSwitch(name string,
 		//BandwidthReservationMode:bandwidthReservationMode,
 		SwitchType:switchType,
 		NetAdapterInterfaceDescriptions:netAdapterInterfaceDescriptions,
+		NetAdapterNames:netAdapterNames,
+		DefaultFlowMinimumBandwidthAbsolute:defaultFlowMinimumBandwidthAbsolute,
+		DefaultFlowMinimumBandwidthWeight:defaultFlowMinimumBandwidthWeight,
+		DefaultQueueVmmqEnabled:defaultQueueVmmqEnabled,
+		DefaultQueueVmmqQueuePairs:defaultQueueVmmqQueuePairs,
+		DefaultQueueVrssEnabled:defaultQueueVrssEnabled,
 	})
 
 	err = c.runFireAndForgetScript(updateVMSwitchTemplate, updateVMSwitchArgs{

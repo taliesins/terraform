@@ -70,6 +70,42 @@ func resourceHyperVNetworkSwitch() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
+
+			"net_adapter_names": {
+				Type:     schema.TypeSet,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Optional: true,
+			},
+
+			"default_flow_minimum_bandwidth_absolute": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+
+			"default_flow_minimum_bandwidth_weight": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+
+			"default_queue_vmmq_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+
+			"default_queue_vmmq_queue_pairs": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+
+			"default_queue_vrss_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 	}
 }
@@ -95,8 +131,14 @@ func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{})
 	bandwidthReservationMode := (d.Get("minimum_bandwidth_mode")).(int)
 	switchType := (d.Get("switch_type")).(int)
 	netAdapterInterfaceDescriptions := (d.Get("net_adapter_interface_descriptions")).([]string)
+	netAdapterNames := (d.Get("net_adapter_names")).([]string)
+	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int)
+	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int)
+	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
+	defaultQueueVmmqQueuePairs := (d.Get("default_queue_vmmq_queue_pairs")).(int)
+	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
-	err = c.CreateVMSwitch(switchName, notes, allowManagementOS, embeddedTeamingEnabled, iovEnabled, packetDirectEnabled, bandwidthReservationMode, switchType, netAdapterInterfaceDescriptions)
+	err = c.CreateVMSwitch(switchName, notes, allowManagementOS, embeddedTeamingEnabled, iovEnabled, packetDirectEnabled, bandwidthReservationMode, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
 	return err
 }
 
@@ -126,6 +168,12 @@ func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (
 	d.Set("minimum_bandwidth_mode", s.BandwidthReservationMode)
 	d.Set("switch_type", s.SwitchType)
 	d.Set("net_adapter_interface_descriptions", s.NetAdapterInterfaceDescriptions)
+	d.Set("net_adapter_names", s.NetAdapterNames)
+	d.Set("default_flow_minimum_bandwidth_absolute", s.DefaultFlowMinimumBandwidthAbsolute)
+	d.Set("default_flow_minimum_bandwidth_weight", s.DefaultFlowMinimumBandwidthWeight)
+	d.Set("default_queue_vmmq_enabled", s.DefaultQueueVmmqEnabled)
+	d.Set("default_queue_vmmq_queue_pairs", s.DefaultQueueVmmqQueuePairs)
+	d.Set("default_queue_vrss_enabled", s.DefaultQueueVrssEnabled)
 
 	return nil
 }
@@ -150,8 +198,14 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 	//bandwidthReservationMode := (d.Get("minimum_bandwidth_mode")).(int)
 	switchType := (d.Get("switch_type")).(int)
 	netAdapterInterfaceDescriptions := (d.Get("net_adapter_interface_descriptions")).([]string)
+	netAdapterNames := (d.Get("net_adapter_names")).([]string)
+	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int)
+	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int)
+	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
+	defaultQueueVmmqQueuePairs := (d.Get("default_queue_vmmq_queue_pairs")).(int)
+	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
-	err = c.UpdateVMSwitch(switchName, notes, allowManagementOS, switchType, netAdapterInterfaceDescriptions)
+	err = c.UpdateVMSwitch(switchName, notes, allowManagementOS, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
 	return err
 }
 

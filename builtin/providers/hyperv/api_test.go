@@ -12,7 +12,7 @@ func TestSerializeVmSwitch(t *testing.T) {
 		AllowManagementOS:true,
 		EmbeddedTeamingEnabled:true,
 		IovEnabled:true,
-		PacketDirectEnabled:true,
+		PacketDirectEnabled:false,
 		BandwidthReservationMode:1,
 		SwitchType:1,
 		NetAdapterInterfaceDescriptions:[]string{"wan", "lan"},
