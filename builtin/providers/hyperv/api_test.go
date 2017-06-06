@@ -15,7 +15,9 @@ func TestSerializeVmSwitch(t *testing.T) {
 		PacketDirectEnabled:false,
 		BandwidthReservationMode:1,
 		SwitchType:1,
-		NetAdapterInterfaceDescriptions:[]string{"wan", "lan"},
+		NetAdapterNames:[]string{"wan", "lan"},
+		DefaultQueueVrssEnabled:true,
+		DefaultQueueVmmqQueuePairs:0,
 	})
 
 	if err != nil {
