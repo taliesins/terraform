@@ -45,7 +45,7 @@ const (
 )
 
 type vm struct {
-	Name		string
+	Name string
 	Generation int
 	AllowUnverifiedPaths bool
 	AutomaticCriticalErrorAction CriticalErrorAction
