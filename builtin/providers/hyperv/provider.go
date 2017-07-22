@@ -1,8 +1,11 @@
 package hyperv
 
 import (
+	"fmt"
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
+	"os"
+	"io/ioutil"
 )
 
 const (
@@ -98,7 +101,7 @@ func Provider() terraform.ResourceProvider {
 
 		ResourcesMap: map[string]*schema.Resource{
 			"hyperv_network_switch": resourceHyperVNetworkSwitch(),
-			//"hyperv_virtual_machine": resourceHyperVVirtualMachine(),
+			"hyperv_machine": resourceHyperVMachine(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -109,12 +112,20 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	var cacert *[]byte = nil
 	cacertPath := d.Get("cacert_path").(string)
 	if cacertPath != "" {
+		if _, err := os.Stat(cacertPath); os.IsNotExist(err) {
+			return nil, fmt.Errorf("cacertPath does not exist - %s.", cacertPath)
+		}
 
+		cacertBytes, err := ioutil.ReadFile(cacertPath)
+		if err != nil {
+			return nil, err
+		}
+		cacert = &cacertBytes
 	}
 
 	config := Config{
-		User:          	d.Get("user").(string),
-		Password:      	d.Get("password").(string),
+		User:       d.Get("user").(string),
+		Password:   d.Get("password").(string),
 		Host: 		d.Get("host").(string),
 		Port: 		d.Get("port").(int),
 		HTTPS:		d.Get("https").(bool),

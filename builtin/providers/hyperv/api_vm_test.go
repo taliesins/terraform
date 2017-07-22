@@ -25,23 +25,13 @@ func TestSerializeVm(t *testing.T) {
 func TestDeserializeVm(t *testing.T){
 	var vmJson = `
 {
-    "BandwidthReservationMode":  2,
-    "NetAdapterInterfaceDescriptions":  [
-                                            "Dell Wireless 1830 802.11ac"
-                                        ],
-    "Notes":  "test notes",
-    "AllowManagementOS":  true,
-    "Name":  "test",
-    "SwitchType":  2,
-    "IovEnabled":  false,
-    "EmbeddedTeamingEnabled":  false,
-    "PacketDirectEnabled":  false
+    "Name":  "TestMachine",
+    "Generation":  2
 }
 `
 
 	var vm vm
 	err := json.Unmarshal([]byte(vmJson), &vm)
-
 	if err != nil {
 		t.Errorf("Unable to deserialize vm: %s", err.Error())
 	}
