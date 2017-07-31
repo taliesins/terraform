@@ -43,73 +43,40 @@ func createCommand(vars string, remotePath string) (commandText string, err erro
 		return "", err
 	}
 
-	command := string(executeCommandTemplateRendered.Bytes())
-
-	commandText, err = generateCommandLineRunner(command)
-	if err != nil {
-		return "", fmt.Errorf("Error generating command line runner: %s", err)
-	}
+	commandText = string(executeCommandTemplateRendered.Bytes())
 
 	return commandText, err
 }
 
 func createElevatedCommand(comm *winrm.Communicator, elevatedUser string, elevatedPassword string, vars string, remotePath string) (commandText string, err error) {
-	var executeElevatedCommandTemplateRendered bytes.Buffer
-
-	err = executeElevatedCommandTemplate.Execute(&executeElevatedCommandTemplateRendered, executeElevatedCommandTemplateOptions{
-		Vars: vars,
-		Path: remotePath,
-	})
-
+	commandText, err = createCommand(vars, remotePath)
 	if err != nil {
-		fmt.Printf("Error creating elevated command template: %s", err)
+		fmt.Printf("Error creating command template: %s", err)
 		return "", err
 	}
 
-	command := string(executeElevatedCommandTemplateRendered.Bytes())
-
-	// OK so we need an elevated shell runner to wrap our command, this is going to have its own path
-	// generate the script and update the command runner in the process
-	commandText, err = generateElevatedRunner(comm, elevatedUser, elevatedPassword, command)
+	elevatedRemotePath, err := generateElevatedRunner(comm, elevatedUser, elevatedPassword, remotePath)
 	if err != nil {
 		return "", fmt.Errorf("Error generating elevated runner: %s", err)
 	}
 
-	return commandText, err
+	return createCommand(vars, elevatedRemotePath)
 }
 
-func generateCommandLineRunner(command string) (commandText string, err error) {
-	log.Printf("Building command line for: %s", command)
-
-	base64EncodedCommand, err := powershellEncode(command)
-	if err != nil {
-		return "", fmt.Errorf("Error encoding command: %s", err)
-	}
-
-	commandText = "powershell -executionpolicy bypass -encodedCommand " + base64EncodedCommand
-
-	return commandText, nil
-}
-
-func generateElevatedRunner(comm *winrm.Communicator, elevatedUser string, elevatedPassword string, command string) (commandText string, err error) {
-	log.Printf("Building elevated command wrapper for: %s", command)
-
-	// generate command
-	base64EncodedCommand, err := powershellEncode(command)
-	if err != nil {
-		return "", fmt.Errorf("Error encoding command: %s", err)
-	}
+func generateElevatedRunner(comm *winrm.Communicator, elevatedUser string, elevatedPassword string, remotePath string) (elevatedRemotePath string, err error) {
+	log.Printf("Building elevated command wrapper for: %s", remotePath)
 
 	name := fmt.Sprintf("terraform-%s", timeOrderedUUID())
 	fileName := fmt.Sprintf(`elevated-shell-%s.ps1`, name)
 
 	var elevatedCommandTemplateRendered bytes.Buffer
 	err = elevatedCommandTemplate.Execute(&elevatedCommandTemplateRendered, elevatedCommandTemplateOptions{
-		User:            elevatedUser,
-		Password:        elevatedPassword,
-		TaskDescription: "Terraform elevated task",
-		TaskName:        name,
-		EncodedCommand:  base64EncodedCommand,
+		User:            		elevatedUser,
+		Password:        		elevatedPassword,
+		TaskDescription: 		"Terraform elevated task",
+		TaskName:        		name,
+		TaskExecutionTimeLimit: "PT2H",
+		ScriptPath: 			remotePath,
 	})
 
 	if err != nil {
@@ -119,14 +86,12 @@ func generateElevatedRunner(comm *winrm.Communicator, elevatedUser string, eleva
 
 	elevatedCommand := string(elevatedCommandTemplateRendered.Bytes())
 
-	path, err := uploadScript(comm, fileName, elevatedCommand)
+	elevatedRemotePath, err = uploadScript(comm, fileName, elevatedCommand)
 	if err != nil {
 		return "", err
 	}
 
-	//We have uploaded a wrapper file that we can execute like a standard command.
-	//Vars are not needed as it will be provided in the script that has been uploaded
-	return createCommand("", path)
+	return elevatedRemotePath, nil
 }
 
 func uploadScript(comm *winrm.Communicator, fileName string, command string) (path string, err error) {
