@@ -3,6 +3,7 @@ package hyperv
 import (
 	"text/template"
 	"encoding/json"
+	"strings"
 )
 
 type CriticalErrorAction int
@@ -26,8 +27,18 @@ var StartAction_name = map[StartAction]string{
 	StartAction_Start: "Start",
 }
 
+var StartAction_value = map[string]StartAction{
+	"nothing": StartAction_Nothing,
+	"startifrunning": StartAction_StartIfRunning,
+	"start": StartAction_Start,
+}
+
 func (x StartAction) String() string {
 	return StartAction_name[x]
+}
+
+func ToStartAction(x string) StartAction {
+	return StartAction_value[strings.ToLower(x)]
 }
 
 type StopAction int
@@ -44,8 +55,18 @@ var StopAction_name = map[StopAction]string{
 	StopAction_ShutDown: "ShutDown",
 }
 
+var StopAction_value = map[string]StopAction{
+	"turnoff": StopAction_TurnOff,
+	"save": StopAction_Save,
+	"shutdown": StopAction_ShutDown,
+}
+
 func (x StopAction) String() string {
 	return StopAction_name[x]
+}
+
+func ToStopAction(x string) StopAction {
+	return StopAction_value[strings.ToLower(x)]
 }
 
 type CheckpointType int
@@ -64,8 +85,19 @@ var CheckpointType_name = map[CheckpointType]string{
 	CheckpointType_Standard: "Standard",
 }
 
+var CheckpointType_value = map[string]CheckpointType{
+	"disabled": CheckpointType_Disabled,
+	"production": CheckpointType_Production,
+	"productiononly": CheckpointType_ProductionOnly,
+	"standard": CheckpointType_Standard,
+}
+
 func (x CheckpointType) String() string {
 	return CheckpointType_name[x]
+}
+
+func ToCheckpointType(x string) CheckpointType {
+	return CheckpointType_value[strings.ToLower(x)]
 }
 
 type OnOffState int
@@ -80,8 +112,17 @@ var OnOffState_name = map[OnOffState]string{
 	OnOffState_Off: "Off",
 }
 
+var OnOffState_value = map[string]OnOffState{
+	"on": OnOffState_On,
+	"off": OnOffState_Off,
+}
+
 func (x OnOffState) String() string {
 	return OnOffState_name[x]
+}
+
+func ToOnOffState(x string) OnOffState {
+	return OnOffState_value[strings.ToLower(x)]
 }
 
 type vm struct {

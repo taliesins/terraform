@@ -3,6 +3,7 @@ package hyperv
 import (
 	"text/template"
 	"encoding/json"
+	"strings"
 )
 
 type VMSwitchBandwidthMode int
@@ -21,8 +22,19 @@ var VMSwitchBandwidthMode_name = map[VMSwitchBandwidthMode]string{
 	VMSwitchBandwidthMode_None: "None",
 }
 
+var VMSwitchBandwidthMode_value = map[string]VMSwitchBandwidthMode{
+	"default": VMSwitchBandwidthMode_Default,
+	"weight": VMSwitchBandwidthMode_Weight,
+	"absolute": VMSwitchBandwidthMode_Absolute,
+	"none": VMSwitchBandwidthMode_None,
+}
+
 func (x VMSwitchBandwidthMode) String() string {
 	return VMSwitchBandwidthMode_name[x]
+}
+
+func ToVMSwitchBandwidthMode(x string) VMSwitchBandwidthMode {
+	return VMSwitchBandwidthMode_value[strings.ToLower(x)]
 }
 
 type VMSwitchType int
@@ -39,8 +51,18 @@ var VMSwitchType_name = map[VMSwitchType]string{
 	VMSwitchType_External: "External",
 }
 
+var VMSwitchType_value = map[string]VMSwitchType{
+	"private": VMSwitchType_Private,
+	"internal": VMSwitchType_Internal,
+	"external": VMSwitchType_External,
+}
+
 func (x VMSwitchType) String() string {
 	return VMSwitchType_name[x]
+}
+
+func ToVMSwitchType(x string) VMSwitchType {
+	return VMSwitchType_value[strings.ToLower(x)]
 }
 
 type vmSwitch struct {
