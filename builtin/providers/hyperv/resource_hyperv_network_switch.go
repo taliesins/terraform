@@ -142,10 +142,10 @@ func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{})
 			netAdapterNames = append(netAdapterNames, v.(string))
 		}
 	}
-	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int64)
-	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int64)
+	defaultFlowMinimumBandwidthAbsolute := int64((d.Get("default_flow_minimum_bandwidth_absolute")).(int))
+	defaultFlowMinimumBandwidthWeight := int64((d.Get("default_flow_minimum_bandwidth_weight")).(int))
 	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
-	defaultQueueVmmqQueuePairs := (d.Get("default_queue_vmmq_queue_pairs")).(int32)
+	defaultQueueVmmqQueuePairs := int32((d.Get("default_queue_vmmq_queue_pairs")).(int))
 	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
 	err = c.CreateVMSwitch(switchName, notes, allowManagementOS, embeddedTeamingEnabled, iovEnabled, packetDirectEnabled, bandwidthReservationMode, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
@@ -228,10 +228,10 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 			netAdapterNames = append(netAdapterNames, v.(string))
 		}
 	}
-	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int64)
-	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int64)
+	defaultFlowMinimumBandwidthAbsolute := int64((d.Get("default_flow_minimum_bandwidth_absolute")).(int))
+	defaultFlowMinimumBandwidthWeight := int64((d.Get("default_flow_minimum_bandwidth_weight")).(int))
 	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
-	defaultQueueVmmqQueuePairs := (d.Get("default_queue_vmmq_queue_pairs")).(int32)
+	defaultQueueVmmqQueuePairs := int32((d.Get("default_queue_vmmq_queue_pairs")).(int))
 	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
 	err = c.UpdateVMSwitch(switchName, notes, allowManagementOS, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
