@@ -85,7 +85,7 @@ New-Vm -Name $vm.Name -Generation $vm.Generation -MemoryStartupBytes $vm.MemoryS
 Set-Vm -Name $vm.Name -GuestControlledCacheTypes:$vm.GuestControlledCacheTypes -LowMemoryMappedIoSpace $vm.LowMemoryMappedIoSpace -HighMemoryMappedIoSpace $vm.HighMemoryMappedIoSpace -ProcessorCount $vm.ProcessorCount -DynamicMemory:$vm.DynamicMemory -StaticMemory:$vm.StaticMemory -MemoryMinimumBytes $vm.MemoryMinimumBytes -MemoryMaximumBytes $vm.MemoryMaximumBytes -MemoryStartupBytes $vm.MemoryStartupBytes -AutomaticStartAction $automaticStartAction -AutomaticStopAction $automaticStopAction -AutomaticStartDelay $vm.AutomaticStartDelay -AutomaticCriticalErrorAction $automaticCriticalErrorAction -AutomaticCriticalErrorActionTimeout $vm.AutomaticCriticalErrorActionTimeout -LockOnDisconnect $lockOnDisconnect -Notes $vm.Notes -SnapshotFileLocation $vm.SnapshotFileLocation -SmartPagingFilePath $vm.SmartPagingFilePath -CheckpointType $checkpointType -AllowUnverifiedPaths $vm.AllowUnverifiedPaths
 `))
 
-func (c *Client) CreateVM(
+func (c *HypervClient) CreateVM(
 	name string,
 	generation int,
 	allowUnverifiedPaths bool,
@@ -173,7 +173,7 @@ var getVMTemplate = template.Must(template.New("GetVM").Parse(`
 }} | ConvertTo-Json
 `))
 
-func (c *Client) GetVM(name string) (result vm, err error) {
+func (c *HypervClient) GetVM(name string) (result vm, err error) {
 	err = c.runScriptWithResult(getVMTemplate, getVMArgs{
 		Name:name,
 	}, &result);
@@ -196,7 +196,7 @@ $lockOnDisconnect = [Microsoft.HyperV.PowerShell.OnOffState]$vm.LockOnDisconnect
 Set-Vm -Name $vm.Name -GuestControlledCacheTypes:$vm.GuestControlledCacheTypes -LowMemoryMappedIoSpace $vm.LowMemoryMappedIoSpace -HighMemoryMappedIoSpace $vm.HighMemoryMappedIoSpace -ProcessorCount $vm.ProcessorCount -DynamicMemory:$vm.DynamicMemory -StaticMemory:$vm.StaticMemory -MemoryMinimumBytes $vm.MemoryMinimumBytes -MemoryMaximumBytes $vm.MemoryMaximumBytes -MemoryStartupBytes $vm.MemoryStartupBytes -AutomaticStartAction $automaticStartAction -AutomaticStopAction $automaticStopAction -AutomaticStartDelay $vm.AutomaticStartDelay -AutomaticCriticalErrorAction $automaticCriticalErrorAction -AutomaticCriticalErrorActionTimeout $vm.AutomaticCriticalErrorActionTimeout -LockOnDisconnect $lockOnDisconnect -Notes $vm.Notes -SnapshotFileLocation $vm.SnapshotFileLocation -SmartPagingFilePath $vm.SmartPagingFilePath -CheckpointType $checkpointType -AllowUnverifiedPaths $vm.AllowUnverifiedPaths
 `))
 
-func (c *Client) UpdateVM(
+func (c *HypervClient) UpdateVM(
 	name string,
 //	generation int,
 	allowUnverifiedPaths bool,
@@ -261,7 +261,7 @@ var deleteVMTemplate = template.Must(template.New("DeleteVM").Parse(`
 Get-VM | ?{$_.Name -eq '{{.Name}}'} | Remove-VM
 `))
 
-func (c *Client) DeleteVM(name string) (err error) {
+func (c *HypervClient) DeleteVM(name string) (err error) {
 	err = c.runFireAndForgetScript(deleteVMTemplate, deleteVMArgs{
 		Name:name,
 	});

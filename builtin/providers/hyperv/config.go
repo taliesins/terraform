@@ -17,9 +17,9 @@ type Config struct {
 	Timeout 	string
 }
 
-// Client() returns a new client for configuring hyperv.
-func (c *Config) Client() (comm *Client, err error) {
-	log.Printf("[INFO] HyperV Client configured for HyperV API operations using:\n"+
+// HypervClient() returns a new client for configuring hyperv.
+func (c *Config) Client() (comm *HypervClient, err error) {
+	log.Printf("[INFO] HyperV HypervClient configured for HyperV API operations using:\n"+
 			"  Host: %s\n"+
 			"  Port: %d\n"+
 			"  User: %s\n"+
@@ -53,8 +53,8 @@ func getWinRMClient(c *Config) (comm *winrm.Communicator, err error) {
 	return winrm.GetCommunicator(connectionInfo)
 }
 
-func getApiClient(c *Config) (client *Client, err error) {
-	client = &Client{
+func getApiClient(c *Config) (client *HypervClient, err error) {
+	client = &HypervClient{
 		ElevatedPassword:c.Password,
 		ElevatedUser:c.User,
 	}

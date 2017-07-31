@@ -112,8 +112,8 @@ func resourceHyperVNetworkSwitch() *schema.Resource {
 
 func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{}) (err error) {
 
-	log.Printf("[DEBUG] creating hyperv switch: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] creating hyperv switch: %#v", d)
+	c := meta.(*HypervClient)
 
 	switchName := ""
 
@@ -139,12 +139,17 @@ func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{})
 	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
 	err = c.CreateVMSwitch(switchName, notes, allowManagementOS, embeddedTeamingEnabled, iovEnabled, packetDirectEnabled, bandwidthReservationMode, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
+
+	if err != nil {
+		log.Printf("[INFO][hyperv] created hyperv switch: %#v", d)
+	}
+
 	return err
 }
 
 func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] reading hyperv switch: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] reading hyperv switch: %#v", d)
+	c := meta.(*HypervClient)
 
 	switchName := ""
 
@@ -175,12 +180,16 @@ func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (
 	d.Set("default_queue_vmmq_queue_pairs", s.DefaultQueueVmmqQueuePairs)
 	d.Set("default_queue_vrss_enabled", s.DefaultQueueVrssEnabled)
 
+	if err != nil {
+		log.Printf("[INFO][hyperv] read hyperv switch: %#v", d)
+	}
+
 	return nil
 }
 
 func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] updating hyperv switch: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] updating hyperv switch: %#v", d)
+	c := meta.(*HypervClient)
 
 	switchName := ""
 
@@ -206,13 +215,18 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 	defaultQueueVrssEnabled := (d.Get("default_queue_vrss_enabled")).(bool)
 
 	err = c.UpdateVMSwitch(switchName, notes, allowManagementOS, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
+
+	if err != nil {
+		log.Printf("[INFO][hyperv] updated hyperv switch: %#v", d)
+	}
+
 	return err
 }
 
 func resourceHyperVNetworkSwitchDelete(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] deleting hyperv switch: %#v", d)
+	log.Printf("[INFO][hyperv] deleting hyperv switch: %#v", d)
 
-	c := meta.(* Client)
+	c := meta.(*HypervClient)
 
 	switchName := ""
 
@@ -223,6 +237,10 @@ func resourceHyperVNetworkSwitchDelete(d *schema.ResourceData, meta interface{})
 	}
 
 	err = c.DeleteVMSwitch(switchName)
+
+	if err != nil {
+		log.Printf("[INFO][hyperv] deleted hyperv switch: %#v", d)
+	}
 
 	return err
 }

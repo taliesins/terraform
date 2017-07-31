@@ -65,7 +65,7 @@ if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
 Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 `))
 
-func (c *Client) CreateVMSwitch(
+func (c *HypervClient) CreateVMSwitch(
 	name string,
 	notes string,
 	allowManagementOS bool,
@@ -132,7 +132,7 @@ var getVMSwitchTemplate = template.Must(template.New("GetVMSwitch").Parse(`
 }} | ConvertTo-Json
 `))
 
-func (c *Client) GetVMSwitch(name string) (result vmSwitch, err error) {
+func (c *HypervClient) GetVMSwitch(name string) (result vmSwitch, err error) {
 	err = c.runScriptWithResult(getVMSwitchTemplate, getVMSwitchArgs{
 		Name:name,
 	}, &result);
@@ -172,7 +172,7 @@ if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
 }
 `))
 
-func (c *Client) UpdateVMSwitch(
+func (c *HypervClient) UpdateVMSwitch(
 	name string,
 	notes string,
 	allowManagementOS bool,
@@ -223,7 +223,7 @@ var deleteVMSwitchTemplate = template.Must(template.New("DeleteVMSwitch").Parse(
 Get-VMSwitch | ?{$_.Name -eq '{{.Name}}'} | Remove-VMSwitch
 `))
 
-func (c *Client) DeleteVMSwitch(name string) (err error) {
+func (c *HypervClient) DeleteVMSwitch(name string) (err error) {
 	err = c.runFireAndForgetScript(deleteVMSwitchTemplate, deleteVMSwitchArgs{
 		Name:name,
 	});

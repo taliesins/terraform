@@ -150,8 +150,8 @@ func resourceHyperVMachine() *schema.Resource {
 }
 
 func resourceHyperVMachineCreate(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] creating hyperv machine: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] creating hyperv machine: %#v", d)
+	c := meta.(*HypervClient)
 
 	name := ""
 
@@ -184,12 +184,17 @@ func resourceHyperVMachineCreate(d *schema.ResourceData, meta interface{}) (err 
 	staticMemory := (d.Get("static_memory")).(bool)
 
 	err = c.CreateVM(name, generation, allowUnverifiedPaths, automaticCriticalErrorAction, automaticCriticalErrorActionTimeout, automaticStartAction, automaticStartDelay, automaticStopAction, checkpointType, dynamicMemory, guestControlledCacheTypes, highMemoryMappedIoSpace, lockOnDisconnect, lowMemoryMappedIoSpace, memoryMaximumBytes, memoryMinimumBytes, memoryStartupBytes, notes, processorCount, smartPagingFilePath, snapshotFileLocation, staticMemory)
+
+	if err != nil {
+		log.Printf("[INFO][hyperv] created hyperv machine: %#v", d)
+	}
+
 	return err
 }
 
 func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] reading hyperv machine: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] reading hyperv machine: %#v", d)
+	c := meta.(*HypervClient)
 
 	name := ""
 
@@ -227,12 +232,16 @@ func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err er
 	d.Set("snapshot_file_location", s.SnapshotFileLocation)
 	d.Set("static_memory", s.StaticMemory)
 
+	if err != nil {
+		log.Printf("[INFO][hyperv] read hyperv machine: %#v", d)
+	}
+
 	return nil
 }
 
 func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] updating hyperv machine: %#v", d)
-	c := meta.(* Client)
+	log.Printf("[INFO][hyperv] updating hyperv machine: %#v", d)
+	c := meta.(*HypervClient)
 
 	name := ""
 
@@ -266,13 +275,17 @@ func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err 
 
 	err = c.UpdateVM(name, allowUnverifiedPaths, automaticCriticalErrorAction, automaticCriticalErrorActionTimeout, automaticStartAction, automaticStartDelay, automaticStopAction, checkpointType, dynamicMemory, guestControlledCacheTypes, highMemoryMappedIoSpace, lockOnDisconnect, lowMemoryMappedIoSpace, memoryMaximumBytes, memoryMinimumBytes, memoryStartupBytes, notes, processorCount, smartPagingFilePath, snapshotFileLocation, staticMemory)
 
+	if err != nil {
+		log.Printf("[INFO][hyperv] updated hyperv machine: %#v", d)
+	}
+
 	return err
 }
 
 func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err error) {
-	log.Printf("[DEBUG] deleting hyperv machine: %#v", d)
+	log.Printf("[INFO][hyperv] deleting hyperv machine: %#v", d)
 
-	c := meta.(* Client)
+	c := meta.(*HypervClient)
 
 	name := ""
 
@@ -283,6 +296,10 @@ func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err 
 	}
 
 	err = c.DeleteVM(name)
+
+	if err != nil {
+		log.Printf("[INFO][hyperv] deleted hyperv machine: %#v", d)
+	}
 
 	return err
 }
