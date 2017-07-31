@@ -112,7 +112,7 @@ func uploadScript(comm *winrm.Communicator, fileName string, command string) (pa
 	defer f.Close()
 	defer os.Remove(tmpFile.Name())
 
-	path = fmt.Sprintf(`%s\%s`, `%TEMP%`, fileName)
+	path = fmt.Sprintf(`%s\%s`, `$env:TEMP`, fileName)
 
 	log.Printf("Uploading shell wrapper for command from [%s] to [%s] ", tmpFile.Name(), path)
 	err = comm.UploadScript(path, f)
