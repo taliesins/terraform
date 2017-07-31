@@ -20,6 +20,16 @@ const (
 	StartAction_Start StartAction = 4
 )
 
+var StartAction_name = map[StartAction]string{
+	StartAction_Nothing: "Nothing",
+	StartAction_StartIfRunning: "StartIfRunning",
+	StartAction_Start: "Start",
+}
+
+func (x StartAction) String() string {
+	return StartAction_name[x]
+}
+
 type StopAction int
 
 const (
@@ -27,6 +37,16 @@ const (
 	StopAction_Save StopAction = 3
 	StopAction_ShutDown StopAction = 4
 )
+
+var StopAction_name = map[StopAction]string{
+	StopAction_TurnOff: "TurnOff",
+	StopAction_Save: "Save",
+	StopAction_ShutDown: "ShutDown",
+}
+
+func (x StopAction) String() string {
+	return StopAction_name[x]
+}
 
 type CheckpointType int
 
@@ -37,12 +57,32 @@ const (
 	CheckpointType_Standard CheckpointType = 5
 )
 
+var CheckpointType_name = map[CheckpointType]string{
+	CheckpointType_Disabled: "Disabled",
+	CheckpointType_Production: "Production",
+	CheckpointType_ProductionOnly: "ProductionOnly",
+	CheckpointType_Standard: "Standard",
+}
+
+func (x CheckpointType) String() string {
+	return CheckpointType_name[x]
+}
+
 type OnOffState int
 
 const (
 	OnOffState_On OnOffState = 0
 	OnOffState_Off OnOffState = 1
 )
+
+var OnOffState_name = map[OnOffState]string{
+	OnOffState_On: "On",
+	OnOffState_Off: "Off",
+}
+
+func (x OnOffState) String() string {
+	return OnOffState_name[x]
+}
 
 type vm struct {
 	Name string

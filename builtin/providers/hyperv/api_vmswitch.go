@@ -14,6 +14,17 @@ const (
 	VMSwitchBandwidthMode_None VMSwitchBandwidthMode = 3
 )
 
+var VMSwitchBandwidthMode_name = map[VMSwitchBandwidthMode]string{
+	VMSwitchBandwidthMode_Default: "Default",
+	VMSwitchBandwidthMode_Weight: "Weight",
+	VMSwitchBandwidthMode_Absolute: "Absolute",
+	VMSwitchBandwidthMode_None: "None",
+}
+
+func (x VMSwitchBandwidthMode) String() string {
+	return VMSwitchBandwidthMode_name[x]
+}
+
 type VMSwitchType int
 
 const (
@@ -22,6 +33,15 @@ const (
 	VMSwitchType_External VMSwitchType = 2
 )
 
+var VMSwitchType_name = map[VMSwitchType]string{
+	VMSwitchType_Private: "Private",
+	VMSwitchType_Internal: "Internal",
+	VMSwitchType_External: "External",
+}
+
+func (x VMSwitchType) String() string {
+	return VMSwitchType_name[x]
+}
 
 type vmSwitch struct {
 	Name		string
