@@ -106,7 +106,7 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
   $registeredTask.Run($null) | Out-Null
   $timeout = 10
   $sec = 0
-  while ( (!($registeredTask.state -eq 4)) -and ($sec -lt $timeout) ) {
+  while ((!($registeredTask.state -eq 4)) -and ($sec -lt $timeout)) {
     Start-Sleep -s 1
     $sec++
   }
@@ -133,7 +133,7 @@ $username = '{{.User}}'.Replace('\.\\', $env:computername+'\')
 $password = '{{.Password}}'
 $taskName = '{{.TaskName}}'
 $taskDescription = '{{.TaskDescription}}'
-$taskExecutionTimeLimit = '{{.TaskExecutionTimeLimit}]'
+$taskExecutionTimeLimit = '{{.TaskExecutionTimeLimit}}'
 $vars = '{{.Vars}}'
 $scriptPath = '{{.ScriptPath}}'
 $exitCode = RunAsScheduledTask -username $username -password $password -taskName $taskName -taskDescription $taskDescription -taskExecutionTimeLimit -vars $vars -scriptPath $scriptPath

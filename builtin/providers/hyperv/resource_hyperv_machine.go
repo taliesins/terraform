@@ -151,7 +151,7 @@ func resourceHyperVMachine() *schema.Resource {
 
 func resourceHyperVMachineCreate(d *schema.ResourceData, meta interface{}) (err error) {
 	log.Printf("[DEBUG] creating hyperv machine: %#v", d)
-	c := meta.(* client)
+	c := meta.(* Client)
 
 	name := ""
 
@@ -189,7 +189,7 @@ func resourceHyperVMachineCreate(d *schema.ResourceData, meta interface{}) (err 
 
 func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err error) {
 	log.Printf("[DEBUG] reading hyperv machine: %#v", d)
-	c := meta.(* client)
+	c := meta.(* Client)
 
 	name := ""
 
@@ -232,7 +232,7 @@ func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err er
 
 func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err error) {
 	log.Printf("[DEBUG] updating hyperv machine: %#v", d)
-	c := meta.(* client)
+	c := meta.(* Client)
 
 	name := ""
 
@@ -272,7 +272,7 @@ func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err 
 func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err error) {
 	log.Printf("[DEBUG] deleting hyperv machine: %#v", d)
 
-	c := meta.(* client)
+	c := meta.(* Client)
 
 	name := ""
 

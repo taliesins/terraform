@@ -18,7 +18,7 @@ type Config struct {
 }
 
 // Client() returns a new client for configuring hyperv.
-func (c *Config) Client() (comm *client, err error) {
+func (c *Config) Client() (comm *Client, err error) {
 	log.Printf("[INFO] HyperV Client configured for HyperV API operations using:\n"+
 			"  Host: %s\n"+
 			"  Port: %d\n"+
@@ -53,8 +53,8 @@ func getWinRMClient(c *Config) (comm *winrm.Communicator, err error) {
 	return winrm.GetCommunicator(connectionInfo)
 }
 
-func getApiClient(c *Config) (client *client, err error) {
-	client = &client{
+func getApiClient(c *Config) (client *Client, err error) {
+	client = &Client{
 		ElevatedPassword:c.Password,
 		ElevatedUser:c.User,
 	}

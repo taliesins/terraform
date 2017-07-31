@@ -10,13 +10,13 @@ import (
 	"strings"
 )
 
-type client struct {
+type Client struct {
 	Communicator 		*winrm.Communicator
 	ElevatedUser            string
 	ElevatedPassword	string
 }
 
-func (c *client) runFireAndForgetScript(script  *template.Template, args interface{})(error){
+func (c *Client) runFireAndForgetScript(script  *template.Template, args interface{})(error){
 	var scriptRendered bytes.Buffer
 	err := script.Execute(&scriptRendered, args)
 
@@ -49,7 +49,7 @@ func (c *client) runFireAndForgetScript(script  *template.Template, args interfa
 	return nil
 }
 
-func (c *client) runScriptWithResult(script  *template.Template, args interface{}, result interface{})(err error){
+func (c *Client) runScriptWithResult(script  *template.Template, args interface{}, result interface{})(err error){
 	var scriptRendered bytes.Buffer
 	err = script.Execute(&scriptRendered, args)
 
