@@ -66,13 +66,13 @@ func resourceHyperVNetworkSwitch() *schema.Resource {
 			},
 
 			"net_adapter_interface_descriptions": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
 
 			"net_adapter_names": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Optional: true,
 			},
@@ -130,8 +130,18 @@ func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{})
 	packetDirectEnabled := (d.Get("enable_packet_direct")).(bool)
 	bandwidthReservationMode := VMSwitchBandwidthMode((d.Get("minimum_bandwidth_mode")).(int))
 	switchType := VMSwitchType((d.Get("switch_type")).(int))
-	netAdapterInterfaceDescriptions := (d.Get("net_adapter_interface_descriptions")).([]string)
-	netAdapterNames := (d.Get("net_adapter_names")).([]string)
+	netAdapterInterfaceDescriptions := []string{}
+	if raw, ok := d.GetOk("net_adapter_interface_descriptions"); ok {
+		for _, v := range raw.([]interface{}) {
+			netAdapterInterfaceDescriptions = append(netAdapterInterfaceDescriptions, v.(string))
+		}
+	}
+	netAdapterNames := []string{}
+	if raw, ok := d.GetOk("net_adapter_names"); ok {
+		for _, v := range raw.([]interface{}) {
+			netAdapterNames = append(netAdapterNames, v.(string))
+		}
+	}
 	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int64)
 	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int64)
 	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
@@ -206,8 +216,18 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 	//packetDirectEnabled := (d.Get("enable_packet_direct")).(bool)
 	//bandwidthReservationMode := VMSwitchBandwidthMode((d.Get("minimum_bandwidth_mode")).(int))
 	switchType := VMSwitchType((d.Get("switch_type")).(int))
-	netAdapterInterfaceDescriptions := (d.Get("net_adapter_interface_descriptions")).([]string)
-	netAdapterNames := (d.Get("net_adapter_names")).([]string)
+	netAdapterInterfaceDescriptions := []string{}
+	if raw, ok := d.GetOk("net_adapter_interface_descriptions"); ok {
+		for _, v := range raw.([]interface{}) {
+			netAdapterInterfaceDescriptions = append(netAdapterInterfaceDescriptions, v.(string))
+		}
+	}
+	netAdapterNames := []string{}
+	if raw, ok := d.GetOk("net_adapter_names"); ok {
+		for _, v := range raw.([]interface{}) {
+			netAdapterNames = append(netAdapterNames, v.(string))
+		}
+	}
 	defaultFlowMinimumBandwidthAbsolute := (d.Get("default_flow_minimum_bandwidth_absolute")).(int64)
 	defaultFlowMinimumBandwidthWeight := (d.Get("default_flow_minimum_bandwidth_weight")).(int64)
 	defaultQueueVmmqEnabled := (d.Get("default_queue_vmmq_enabled")).(bool)
