@@ -19,7 +19,7 @@ type Config struct {
 
 // HypervClient() returns a new client for configuring hyperv.
 func (c *Config) Client() (comm *HypervClient, err error) {
-	log.Printf("[INFO] HyperV HypervClient configured for HyperV API operations using:\n"+
+	log.Printf("[INFO][hyperv] HyperV HypervClient configured for HyperV API operations using:\n"+
 			"  Host: %s\n"+
 			"  Port: %d\n"+
 			"  User: %s\n"+

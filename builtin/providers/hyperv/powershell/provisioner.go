@@ -112,13 +112,13 @@ func uploadScript(comm *winrm.Communicator, fileName string, command string) (pa
 	defer f.Close()
 	defer os.Remove(tmpFile.Name())
 
-	log.Printf("Uploading shell wrapper for command to [%s] from [%s]", path, tmpFile.Name())
+	path = fmt.Sprintf(`%s\%s`, `%TEMP%`, fileName)
+
+	log.Printf("Uploading shell wrapper for command from [%s] to [%s] ", tmpFile.Name(), path)
 	err = comm.UploadScript(path, f)
 	if err != nil {
 		return "", fmt.Errorf("Error uploading shell script: %s", err)
 	}
-
-	path = fmt.Sprintf(`%s\%s`, `%TEMP%`, fileName)
 
 	return path, nil
 }
