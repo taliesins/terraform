@@ -1670,10 +1670,10 @@
 			"revisionTime": "2016-06-08T18:30:07Z"
 		},
 		{
-			"checksumSHA1": "6uNzRk3ScsTC+olpCXkW4M/L3fg=",
+			"checksumSHA1": "LY1os7cX/gWXWTWYCHCtEaf5jSw=",
 			"path": "github.com/masterzen/winrm",
-			"revision": "b7e3d2de4979ce5eae5c1c1ef450040c5d675a89",
-			"revisionTime": "2017-01-26T07:02:57Z"
+			"revision": "1ca0ba637a877ee12b69abc73c6161fccb77b70a",
+			"revisionTime": "2017-06-01T21:16:37Z"
 		},
 		{
 			"checksumSHA1": "KTsgWipT3ennAAtaKxEZairxero=",
@@ -1776,6 +1776,12 @@
 			"path": "github.com/nu7hatch/gouuid",
 			"revision": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3",
 			"revisionTime": "2013-12-21T20:05:32Z"
+		},
+		{
+			"checksumSHA1": "dIMJD0AZwSwmuOuTaGgqWZkzuPU=",
+			"path": "github.com/packer-community/winrmcp",
+			"revision": "078cc0a785c9da54158c0775f06f505fc1e867f8",
+			"revisionTime": "2017-06-07T14:21:56Z"
 		},
 		{
 			"checksumSHA1": "CeruhvOoHGjNlO+8M7WSUUz1oXA=",
