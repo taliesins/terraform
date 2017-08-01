@@ -34,17 +34,17 @@ func (c *HypervClient) runFireAndForgetScript(script  *template.Template, args i
 	}
 
 	if !exited {
-		return fmt.Errorf("Command did not execute completly: \nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command did not execute completly: \nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", stderr, stdout, c.Vars, command)
 	}
 
 	if exitStatus != 0 {
-		return fmt.Errorf("Command exit code not expected: %d\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command exit code not expected: %d\nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", exitStatus, stderr, stdout, c.Vars, command)
 	}
 
 	stderr = strings.TrimSpace(stderr)
 
 	if len(stderr) > 0 {
-		return fmt.Errorf("Command stderr: \nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command stderr: \nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", stderr, stdout, c.Vars, command)
 	}
 
 	return nil
@@ -67,17 +67,17 @@ func (c *HypervClient) runScriptWithResult(script  *template.Template, args inte
 	}
 
 	if !exited {
-		return fmt.Errorf("Command did not execute completly: \nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command did not execute completly: \nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", stderr, stdout, c.Vars, command)
 	}
 
 	if exitStatus != 0 {
-		return fmt.Errorf("Command exit code not expected: %d\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command exit code not expected: %d\nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", exitStatus, stderr, stdout, c.Vars, command)
 	}
 
 	stderr = strings.TrimSpace(stderr)
 
 	if len(stderr) > 0 {
-		return fmt.Errorf("Command stderr: \nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command stderr: \nstderr:\n%s\nstdout:\n%s\nvars:\n%s\ncommand:\n%s", stderr, stdout, c.Vars, command)
 	}
 
 	stdout = strings.TrimSpace(stdout)
