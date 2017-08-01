@@ -32,7 +32,11 @@ type elevatedCommandTemplateOptions struct {
 	ScriptPath  			string
 }
 
-var elevatedCommandTemplate = template.Must(template.New("ElevatedCommand").Parse(`
+var elevatedCommandTemplate = template.Must(template.New("ElevatedCommand").Funcs(template.FuncMap{
+	"escapeSingleQuotes": func(textToEscape string) string {
+		return strings.Replace(textToEscape, `'`, `''`, -1)
+	},
+}).Parse(`
 function GetTempFile($fileName) {
   $path = $env:TEMP
   if (!$path){
@@ -100,7 +104,10 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
     </Actions>
 </Task>
 '@
-  $arguments = '/C powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&""' + $scriptPath + '"";exit $LastExitCode }" *> "' + $stdoutFile + '"'
+  $powershellToExecute = '& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptPath + '";exit $LastExitCode }'
+  $powershellToExecute = $powershellToExecute.Replace('"', '""')
+
+  $arguments = '/C powershell "' + $powershellToExecute + '" *> "' + $stdoutFile + '"'
   $taskXml = $taskXml.Replace("{arguments}", $arguments.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{username}", $username.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{taskDescription}", $taskDescription.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
@@ -140,13 +147,13 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
   return $exit_code
 }
 
-$username = '{{.User}}'.Replace('\.\\', $env:computername+'\')
-$password = '{{.Password}}'
-$taskName = '{{.TaskName}}'
-$taskDescription = '{{.TaskDescription}}'
-$taskExecutionTimeLimit = '{{.TaskExecutionTimeLimit}}'
-$vars = '{{.Vars}}'
-$scriptPath = '{{.ScriptPath}}'
+$username = '{{escapeSingleQuotes .User}}'.Replace('\.\\', $env:computername+'\')
+$password = '{{escapeSingleQuotes .Password}}'
+$taskName = '{{escapeSingleQuotes .TaskName}}'
+$taskDescription = '{{escapeSingleQuotes .TaskDescription}}'
+$taskExecutionTimeLimit = '{{escapeSingleQuotes .TaskExecutionTimeLimit}}'
+$vars = '{{escapeSingleQuotes .Vars}}'
+$scriptPath = '{{escapeSingleQuotes .ScriptPath}}'
 $exitCode = RunAsScheduledTask -username $username -password $password -taskName $taskName -taskDescription $taskDescription -taskExecutionTimeLimit $taskExecutionTimeLimit -vars $vars -scriptPath $scriptPath
 exit $exitCode
 `))
