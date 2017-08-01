@@ -89,7 +89,7 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
     </Actions>
 </Task>
 '@
-  $arguments = '/S /C "powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars+ ';&"'+$scriptFile+'"; exit $LastExitCode }" *> $stdoutFile "'
+  $arguments = '/S /C "powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptFile + '";exit $LastExitCode }" *> $stdoutFile"'
   $taskXml = $taskXml.Replace("{arguments}", $arguments.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{username}", $username.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{taskDescription}", $taskDescription.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
