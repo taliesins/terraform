@@ -43,7 +43,7 @@ function SanitizeFileName($fileName) {
     return $fileName.Replace(' ', '_').Replace('&', 'and').Replace('{', '(').Replace('}', ')').Replace('~', '-').Replace('#', '').Replace('%', '')
 }
 
-function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $taskExecutionTimeLimit, $vars, $scriptFile)
+function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $taskExecutionTimeLimit, $vars, $scriptPath)
 {
   $stdoutFile = GetTempFile("$(SanitizeFileName($taskName))_stdout.log")
   if (Test-Path $stdoutFile) {
@@ -89,7 +89,7 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
     </Actions>
 </Task>
 '@
-  $arguments = '/S /C "powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptFile + '";exit $LastExitCode }" *> $stdoutFile"'
+  $arguments = '/C powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptPath + '";exit $LastExitCode }" *> "' + $stdoutFile + '"'
   $taskXml = $taskXml.Replace("{arguments}", $arguments.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{username}", $username.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{taskDescription}", $taskDescription.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
@@ -136,6 +136,6 @@ $taskDescription = '{{.TaskDescription}}'
 $taskExecutionTimeLimit = '{{.TaskExecutionTimeLimit}}'
 $vars = '{{.Vars}}'
 $scriptPath = '{{.ScriptPath}}'
-$exitCode = RunAsScheduledTask -username $username -password $password -taskName $taskName -taskDescription $taskDescription -taskExecutionTimeLimit -vars $vars -scriptPath $scriptPath
+$exitCode = RunAsScheduledTask -username $username -password $password -taskName $taskName -taskDescription $taskDescription -taskExecutionTimeLimit $taskExecutionTimeLimit -vars $vars -scriptPath $scriptPath
 exit $exitCode
 `))
