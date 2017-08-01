@@ -1562,14 +1562,15 @@
 			"revisionTime": "2016-06-08T18:30:07Z"
 		},
 		{
-			"checksumSHA1": "S9h7TFYtCXLDiyCj6jSl2ZY7whs=",
-			"path": "github.com/masterzen/winrm/soap",
-			"revision": "54ea5d01478cfc2afccec1504bd0dfcd8c260cfa"
+			"checksumSHA1": "6uNzRk3ScsTC+olpCXkW4M/L3fg=",
+			"path": "github.com/masterzen/winrm",
+			"revision": "b7e3d2de4979ce5eae5c1c1ef450040c5d675a89",
+			"revisionTime": "2017-01-26T07:02:57Z"
 		},
 		{
-			"checksumSHA1": "EDLx+ahJK3YagaYTnbE+VqE0ePs=",
-			"path": "github.com/masterzen/winrm/winrm",
-			"revision": "54ea5d01478cfc2afccec1504bd0dfcd8c260cfa"
+			"checksumSHA1": "KTsgWipT3ennAAtaKxEZairxero=",
+			"path": "github.com/masterzen/winrm/soap",
+			"revision": "ef3efbb97f99fc204bd9c7edf778a0dbd9781baf"
 		},
 		{
 			"checksumSHA1": "bx+egnFe0OB0BZBcgZcaqsvcmS4=",
@@ -1669,9 +1670,10 @@
 			"revisionTime": "2013-12-21T20:05:32Z"
 		},
 		{
-			"checksumSHA1": "d1VHczIGt2bhYR0BNkTedIS/9uk=",
+			"checksumSHA1": "CeruhvOoHGjNlO+8M7WSUUz1oXA=",
 			"path": "github.com/packer-community/winrmcp/winrmcp",
-			"revision": "3d184cea22ee1c41ec1697e0d830ff0c78f7ea97"
+			"revision": "eda77c146d051992c737322f60a4f690c9538aa1",
+			"revisionTime": "2017-01-17T09:42:35Z"
 		},
 		{
 			"checksumSHA1": "rJab1YdNhQooDiBWNnt7TLWPyBU=",

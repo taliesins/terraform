@@ -28,6 +28,7 @@ type Config struct {
 	OperationTimeout      	time.Duration
 	MaxOperationsPerShell 	int
 	TransportDecorator    	func() winrm.Transporter
+	TransportDecorator    func() winrm.Transporter
 }
 
 type Auth struct {
