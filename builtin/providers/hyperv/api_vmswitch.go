@@ -95,7 +95,7 @@ $NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
 $NetAdapterNames = @($vmSwitch.$NetAdapterNames)
 #when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
 
-if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
+if ($NetAdapterInterfaceDescriptions -or $NetAdapterNames) {
 	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -NetAdapterInterfaceDescription $NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames
 } else {
 	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -SwitchType $switchType
@@ -194,7 +194,7 @@ $NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
 $NetAdapterNames = @($vmSwitch.$NetAdapterNames)
 #when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
 
-if ($NetAdapterInterfaceDescriptions || $NetAdapterNames) {
+if ($NetAdapterInterfaceDescriptions -or $NetAdapterNames) {
 	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 
 	#Updates not supported on:
