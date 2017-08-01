@@ -163,10 +163,14 @@ func RunCommand(comm *winrm.Communicator, elevatedUser string, elevatedPassword 
 	cmd.Stdout = stdoutBuffer
 	cmd.Stderr = stderrBuffer
 
+	log.Printf("Executing run command shell wrapper with: %s", commandLine)
+
 	err = comm.Start(&cmd)
+
 	if err != nil {
 		return false, 0, "", "", fmt.Errorf("error executing remote command: %s", err)
 	}
+
 	cmd.Wait()
 
 	return cmd.Exited, cmd.ExitStatus, stdoutBuffer.String(), stderrBuffer.String(), nil
