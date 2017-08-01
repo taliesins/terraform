@@ -38,7 +38,7 @@ func (c *HypervClient) runFireAndForgetScript(script  *template.Template, args i
 	}
 
 	if exitStatus != 0 {
-		return fmt.Errorf("Command exit code not expected: %s\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command exit code not expected: %d\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
 	}
 
 	stderr = strings.TrimSpace(stderr)
@@ -71,7 +71,7 @@ func (c *HypervClient) runScriptWithResult(script  *template.Template, args inte
 	}
 
 	if exitStatus != 0 {
-		return fmt.Errorf("Command exit code not expected: %s\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
+		return fmt.Errorf("Command exit code not expected: %d\nstderr:%s\nstdout:%s\nvars:%s\ncommand:%s", exitStatus, stderr, stdout, c.Vars, command)
 	}
 
 	stderr = strings.TrimSpace(stderr)
