@@ -20,7 +20,7 @@ type executeCommandTemplateOptions struct {
 	Path        	string
 }
 
-var executeCommandTemplate = template.Must(template.New("ExecuteCommand").Parse(`& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};{{.Vars}};&"{{.Path}}";exit $LastExitCode }`))
+var executeCommandTemplate = template.Must(template.New("ExecuteCommand").Parse(`& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};{{.Vars}};&{{.Path}};exit $LastExitCode }`))
 
 type elevatedCommandTemplateOptions struct {
 	User            		string

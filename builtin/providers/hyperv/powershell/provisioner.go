@@ -145,14 +145,25 @@ func RunCommand(comm *winrm.Communicator, elevatedUser string, elevatedPassword 
 		return false, 0, "", "", err
 	}
 
+	var executeCommandFromCommandLineTemplateRendered bytes.Buffer
+	err = executeCommandFromCommandLineTemplate.Execute(&executeCommandFromCommandLineTemplateRendered, executeCommandFromCommandLineTemplateOptions{
+		Powershell: command,
+	})
+
+	if err != nil {
+		return false, 0, "", "", err
+	}
+
+	commandLine := string(executeCommandFromCommandLineTemplateRendered.Bytes())
+
 	var cmd remote.Cmd
 	stdoutBuffer := new(bytes.Buffer)
 	stderrBuffer := new(bytes.Buffer)
-	cmd.Command = command
+	cmd.Command = commandLine
 	cmd.Stdout = stdoutBuffer
 	cmd.Stderr = stderrBuffer
 
-	log.Printf("Executing run command shell wrapper with: %s", command)
+	log.Printf("Executing run command shell wrapper with: %s", commandLine)
 
 	err = comm.Start(&cmd)
 
