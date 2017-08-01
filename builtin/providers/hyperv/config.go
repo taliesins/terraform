@@ -12,7 +12,10 @@ type Config struct {
 	Port	      	int
 	HTTPS	      	bool
 	Insecure      	bool
-	CACert     		*[]byte
+	TLSServerName 	string
+	CACert     		[]byte
+	Key    			[]byte
+	Cert     		[]byte
 	ScriptPath 		string
 	Timeout 		string
 }
@@ -26,7 +29,10 @@ func (c *Config) Client() (comm *HypervClient, err error) {
 			"  Password: %t\n"+
 			"  HTTPS: %t\n"+
 			"  Insecure: %t\n"+
+			"  TLSServerName: %t\n"+
 			"  CACert: %t\n"+
+			"  Cert: %t\n"+
+			"  Key: %t\n"+
 			"  ScriptPath: %t\n"+
 			"  Timeout: %t",
 		c.Host,
@@ -35,7 +41,10 @@ func (c *Config) Client() (comm *HypervClient, err error) {
 		c.Password != "",
 		c.HTTPS,
 		c.Insecure,
+		c.TLSServerName,
 		c.CACert != nil,
+		c.Cert != nil,
+		c.Key != nil,
 		c.ScriptPath,
 		c.Timeout,
 	)
@@ -45,7 +54,7 @@ func (c *Config) Client() (comm *HypervClient, err error) {
 
 // New creates a new communicator implementation over WinRM.
 func getWinRMClient(c *Config) (comm *winrm.Communicator, err error) {
-	connectionInfo, err := winrm.GetConnectionInfo(c.Host, c.Port, c.User, c.Password, c.HTTPS, c.Insecure, c.Timeout, c.CACert, c.ScriptPath)
+	connectionInfo, err := winrm.GetConnectionInfo(c.Host, c.Port, c.User, c.Password, c.HTTPS, c.Insecure, c.TLSServerName, c.Timeout, c.CACert, c.Cert, c.Key, c.ScriptPath)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/terraform/communicator/remote"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/masterzen/winrm/winrm"
+	"github.com/masterzen/winrm"
 	"github.com/packer-community/winrmcp/winrmcp"
 
 	// This import is a bit strange, but it's needed so `make updatedeps` can see and download it
@@ -39,11 +39,15 @@ func New(s *terraform.InstanceState) (*Communicator, error) {
 
 func GetCommunicator(connInfo *connectionInfo)(*Communicator, error) {
 	endpoint := &winrm.Endpoint{
-		Host:     connInfo.Host,
-		Port:     connInfo.Port,
-		HTTPS:    connInfo.HTTPS,
-		Insecure: connInfo.Insecure,
-		CACert:   connInfo.CACert,
+		Host:     		connInfo.Host,
+		Port:     		connInfo.Port,
+		HTTPS:    		connInfo.HTTPS,
+		Insecure: 		connInfo.Insecure,
+		TLSServerName:	connInfo.TLSServerName,
+		CACert:   		connInfo.CACert,
+		Key:			connInfo.Key,
+		Cert:			connInfo.Cert,
+		Timeout:		connInfo.TimeoutVal,
 	}
 
 	comm := &Communicator{
@@ -62,7 +66,7 @@ func (c *Communicator) Connect(o terraform.UIOutput) error {
 		return nil
 	}
 
-	params := winrm.DefaultParameters()
+	params := winrm.DefaultParameters
 	params.Timeout = formatDuration(c.Timeout())
 
 	client, err := winrm.NewClientWithParameters(
@@ -80,14 +84,20 @@ func (c *Communicator) Connect(o terraform.UIOutput) error {
 				"  Password: %t\n"+
 				"  HTTPS: %t\n"+
 				"  Insecure: %t\n"+
-				"  CACert: %t",
+				"  TLSServerName: %t\n"+
+				"  CACert: %t\n"+
+				"  Cert: %t\n"+
+				"  Key: %t",
 			c.connInfo.Host,
 			c.connInfo.Port,
 			c.connInfo.User,
 			c.connInfo.Password != "",
 			c.connInfo.HTTPS,
 			c.connInfo.Insecure,
+			c.connInfo.TLSServerName,
 			c.connInfo.CACert != nil,
+			c.connInfo.Cert != nil,
+			c.connInfo.Key != nil,
 		))
 	}
 
@@ -208,13 +218,24 @@ func (c *Communicator) newCopyClient() (*winrmcp.Winrmcp, error) {
 		},
 		Https:                 c.connInfo.HTTPS,
 		Insecure:              c.connInfo.Insecure,
+		//TLSServerName:              c.connInfo.TLSServerName,
 		OperationTimeout:      c.Timeout(),
 		MaxOperationsPerShell: 15, // lowest common denominator
 	}
 
 	if c.connInfo.CACert != nil {
-		config.CACertBytes = *c.connInfo.CACert
+		config.CACertBytes = c.connInfo.CACert
 	}
+
+	/*
+	if c.connInfo.Cert != nil {
+		config.CertBytes = c.connInfo.Cert
+	}
+
+	if c.connInfo.Key != nil {
+		config.KeyBytes = c.connInfo.Key
+	}
+	*/
 
 	return winrmcp.New(addr, &config)
 }

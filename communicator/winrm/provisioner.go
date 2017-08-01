@@ -31,16 +31,19 @@ const (
 // only keys we look at. If a KeyFile is given, that is used instead
 // of a password.
 type connectionInfo struct {
-	User       string
-	Password   string
-	Host       string
-	Port       int
-	HTTPS      bool
-	Insecure   bool
-	CACert     *[]byte `mapstructure:"ca_cert"`
-	Timeout    string
-	ScriptPath string        `mapstructure:"script_path"`
-	TimeoutVal time.Duration `mapstructure:"-"`
+	User       		string
+	Password   		string
+	Host       		string
+	Port       		int
+	HTTPS      		bool
+	Insecure   		bool
+	TLSServerName 	string
+	CACert     		[]byte			`mapstructure:"ca_cert"`
+	Key    			[]byte			`mapstructure:"key"`
+	Cert     		[]byte			`mapstructure:"cert"`
+	Timeout    		string
+	ScriptPath 		string			`mapstructure:"script_path"`
+	TimeoutVal 		time.Duration	`mapstructure:"-"`
 }
 
 func validateConnectionInfo(connInfo *connectionInfo)(*connectionInfo, error) {
@@ -78,7 +81,7 @@ func validateConnectionInfo(connInfo *connectionInfo)(*connectionInfo, error) {
 	return connInfo, nil
 }
 
-func GetConnectionInfo(host string, port int, user string, password string, HTTPS bool, insecure bool, timeout string, cacert *[]byte, scriptPath string) ( *connectionInfo, error)  {
+func GetConnectionInfo(host string, port int, user string, password string, HTTPS bool, insecure bool, tlsServerName, timeout string, cacert []byte, cert []byte, key []byte, scriptPath string) ( *connectionInfo, error)  {
 	connInfo := &connectionInfo{}
 	connInfo.Host = host
 	connInfo.Port = port
@@ -89,6 +92,9 @@ func GetConnectionInfo(host string, port int, user string, password string, HTTP
 	connInfo.Timeout = timeout
 	connInfo.CACert = cacert
 	connInfo.ScriptPath = scriptPath
+	connInfo.TLSServerName = tlsServerName
+	connInfo.Key = key
+	connInfo.Cert = cert
 
 	return validateConnectionInfo(connInfo)
 }

@@ -15,6 +15,8 @@ const (
 
 	DefaultAllowInsecure = false
 
+	DefaultTLSServerName = ""
+
 	// DefaultUser is used if there is no user given
 	DefaultUser = "Administrator"
 
@@ -22,6 +24,10 @@ const (
 	DefaultPort = 5985
 
 	DefaultCACertFile = ""
+
+	DefaultCertFile = ""
+
+	DefaultKeyFile = ""
 
 	// DefaultScriptPath is used as the path to copy the file to
 	// for remote execution if not provided otherwise.
@@ -77,11 +83,32 @@ func Provider() terraform.ResourceProvider {
 				Description: "Should insecure communication be used for HyperV API operations.",
 			},
 
+			"tls_server_name": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("HYPERV_TLS_SERVER_NAME", DefaultTLSServerName),
+				Description: "Should TLS server name be used for HyperV API operations.",
+			},
+
 			"cacert_path": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("HYPERV_CACERT_PATH", DefaultCACertFile),
 				Description: "The ca cert to use for HyperV API operations.",
+			},
+
+			"cert_path": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("HYPERV_CERT_PATH", DefaultCertFile),
+				Description: "The cert to use for HyperV API operations.",
+			},
+
+			"key_path": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("HYPERV_KEY_PATH", DefaultKeyFile),
+				Description: "The cert key to use for HyperV API operations.",
 			},
 
 			"script_path": &schema.Schema{
@@ -109,30 +136,59 @@ func Provider() terraform.ResourceProvider {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	var cacert *[]byte = nil
+	var err error = nil
+	var cacert []byte = nil
 	cacertPath := d.Get("cacert_path").(string)
 	if cacertPath != "" {
 		if _, err := os.Stat(cacertPath); os.IsNotExist(err) {
 			return nil, fmt.Errorf("cacertPath does not exist - %s.", cacertPath)
 		}
 
-		cacertBytes, err := ioutil.ReadFile(cacertPath)
+		cacert, err = ioutil.ReadFile(cacertPath)
 		if err != nil {
 			return nil, err
 		}
-		cacert = &cacertBytes
+	}
+
+	var cert []byte = nil
+	certPath := d.Get("cert_path").(string)
+	if certPath != "" {
+		if _, err := os.Stat(certPath); os.IsNotExist(err) {
+			return nil, fmt.Errorf("certPath does not exist - %s.", certPath)
+		}
+
+		cert, err = ioutil.ReadFile(certPath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var key []byte = nil
+	keyPath := d.Get("key_path").(string)
+	if keyPath != "" {
+		if _, err := os.Stat(keyPath); os.IsNotExist(err) {
+			return nil, fmt.Errorf("keyPath does not exist - %s.", keyPath)
+		}
+
+		key, err = ioutil.ReadFile(keyPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	config := Config{
-		User:       d.Get("user").(string),
-		Password:   d.Get("password").(string),
-		Host: 		d.Get("host").(string),
-		Port: 		d.Get("port").(int),
-		HTTPS:		d.Get("https").(bool),
-		CACert:		cacert,
-		Insecure:	d.Get("insecure").(bool),
-		ScriptPath:	d.Get("script_path").(string),
-		Timeout:	d.Get("timeout").(string),
+		User:       	d.Get("user").(string),
+		Password:   	d.Get("password").(string),
+		Host: 			d.Get("host").(string),
+		Port: 			d.Get("port").(int),
+		HTTPS:			d.Get("https").(bool),
+		CACert:			cacert,
+		Cert:			cert,
+		Key:			key,
+		Insecure:		d.Get("insecure").(bool),
+		TLSServerName:	d.Get("tls_server_name").(string),
+		ScriptPath:		d.Get("script_path").(string),
+		Timeout:		d.Get("timeout").(string),
 	}
 
 	return config.Client()
