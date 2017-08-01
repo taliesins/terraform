@@ -12,9 +12,9 @@ type Config struct {
 	Port	      	int
 	HTTPS	      	bool
 	Insecure      	bool
-	CACert     	*[]byte
-	ScriptPath 	string
-	Timeout 	string
+	CACert     		*[]byte
+	ScriptPath 		string
+	Timeout 		string
 }
 
 // HypervClient() returns a new client for configuring hyperv.
@@ -57,6 +57,7 @@ func getApiClient(c *Config) (client *HypervClient, err error) {
 	client = &HypervClient{
 		ElevatedPassword:c.Password,
 		ElevatedUser:c.User,
+		Vars:"",
 	}
 
 	comm, err := getWinRMClient(c)
