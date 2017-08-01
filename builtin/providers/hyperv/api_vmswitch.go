@@ -88,12 +88,20 @@ type createVMSwitchArgs struct {
 }
 
 var createVMSwitchTemplate = template.Must(template.New("CreateVMSwitch").Parse(`
+$ErrorActionPreference = 'Stop'
+Get-Vm | Out-Null
 $vmSwitch = '{{.VmSwitchJson}}' | ConvertFrom-Json
 $minimumBandwidthMode = [Microsoft.HyperV.PowerShell.VMSwitchBandwidthMode]$vmSwitch.BandwidthReservationMode
 $switchType = [Microsoft.HyperV.PowerShell.VMSwitchType]$vmSwitch.SwitchType
 $NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
 $NetAdapterNames = @($vmSwitch.$NetAdapterNames)
 #when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
+
+$switchObject = Get-VMSwitch | ?{$_.Name -eq $vmSwitch.Name}
+
+if ($switchObject){
+	throw "Switch already exists - $($vmSwitch.Name)"
+}
 
 if ($NetAdapterInterfaceDescriptions -or $NetAdapterNames) {
 	New-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled -EnableIov $vmSwitch.IovEnabled -EnablePacketDirect $vmSwitch.PacketDirectEnabled -MinimumBandwidthMode $minimumBandwidthMode -NetAdapterInterfaceDescription $NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames
@@ -104,7 +112,27 @@ if ($NetAdapterInterfaceDescriptions -or $NetAdapterNames) {
 	#-AllowManagementOS $vmSwitch.AllowManagementOS
 }
 
-Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
+$switchObject = Get-VMSwitch -Name $vmSwitch.Name
+
+if ($switchObject.DefaultFlowMinimumBandwidthAbsolute -ne $vmSwitch.DefaultFlowMinimumBandwidthAbsolute) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute
+}
+
+if ($switchObject.DefaultFlowMinimumBandwidthWeight -ne $vmSwitch.DefaultFlowMinimumBandwidthWeight) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight
+}
+
+if ($switchObject.DefaultQueueVmmqEnabled -ne $vmSwitch.DefaultQueueVmmqEnabled) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled
+}
+
+if ($switchObject.DefaultQueueVmmqQueuePairs -ne $vmSwitch.DefaultQueueVmmqQueuePairs) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs
+}
+
+if ($switchObject.DefaultQueueVrssEnabled -ne $vmSwitch.DefaultQueueVrssEnabled) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
+}
 `))
 
 func (c *HypervClient) CreateVMSwitch(
@@ -155,6 +183,7 @@ type getVMSwitchArgs struct {
 }
 
 var getVMSwitchTemplate = template.Must(template.New("GetVMSwitch").Parse(`
+$ErrorActionPreference = 'Stop'
 (Get-VMSwitch -name '{{.Name}}') | %{ @{
 	Name=$_.Name;
 	Notes=$_.Notes;
@@ -187,6 +216,8 @@ type updateVMSwitchArgs struct {
 }
 
 var updateVMSwitchTemplate = template.Must(template.New("UpdateVMSwitch").Parse(`
+$ErrorActionPreference = 'Stop'
+Get-Vm | Out-Null
 $vmSwitch = '{{.VmSwitchJson}}' | ConvertFrom-Json
 $minimumBandwidthMode = [Microsoft.HyperV.PowerShell.VMSwitchBandwidthMode]$vmSwitch.BandwidthReservationMode
 $switchType = [Microsoft.HyperV.PowerShell.VMSwitchType]$vmSwitch.SwitchType
@@ -194,23 +225,55 @@ $NetAdapterInterfaceDescriptions = @($vmSwitch.NetAdapterInterfaceDescriptions)
 $NetAdapterNames = @($vmSwitch.$NetAdapterNames)
 #when EnablePacketDirect=true it seems to throw an exception if EnableIov=true or EnableEmbeddedTeaming=true
 
+$switchObject = Get-VMSwitch | ?{$_.Name -eq $vmSwitch.Name}
+
+if (!$switchObject){
+	throw "Switch does not exist - $($vmSwitch.Name)"
+}
+
 if ($NetAdapterInterfaceDescriptions -or $NetAdapterNames) {
-	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
+	Set-VMSwitch -Name $vmSwitch.Name -AllowManagementOS $vmSwitch.AllowManagementOS -NetAdapterInterfaceDescription $vmSwitch.NetAdapterInterfaceDescriptions -NetAdapterName $NetAdapterNames
 
 	#Updates not supported on:
 	#-EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled
 	#-EnableIov $vmSwitch.IovEnabled
 	#-EnablePacketDirect $vmSwitch.PacketDirectEnabled
 	#-MinimumBandwidthMode $minimumBandwidthMode
-
 } else {
-	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes -AllowManagementOS $vmSwitch.AllowManagementOS -SwitchType $switchType -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
+	Set-VMSwitch -Name $vmSwitch.Name -SwitchType $switchType
 
 	#Updates not supported on:
 	#-EnableEmbeddedTeaming $vmSwitch.EmbeddedTeamingEnabled
 	#-EnableIov $vmSwitch.IovEnabled
 	#-EnablePacketDirect $vmSwitch.PacketDirectEnabled
 	#-MinimumBandwidthMode $minimumBandwidthMode
+
+	#not used unless interface is specified
+	#-AllowManagementOS $vmSwitch.AllowManagementOS
+}
+
+if ($switchObject.Notes -ne $vmSwitch.Notes) {
+	Set-VMSwitch -Name $vmSwitch.Name -Notes $vmSwitch.Notes
+}
+
+if ($switchObject.DefaultFlowMinimumBandwidthAbsolute -ne $vmSwitch.DefaultFlowMinimumBandwidthAbsolute) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthAbsolute $vmSwitch.DefaultFlowMinimumBandwidthAbsolute
+}
+
+if ($switchObject.DefaultFlowMinimumBandwidthWeight -ne $vmSwitch.DefaultFlowMinimumBandwidthWeight) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultFlowMinimumBandwidthWeight $vmSwitch.DefaultFlowMinimumBandwidthWeight
+}
+
+if ($switchObject.DefaultQueueVmmqEnabled -ne $vmSwitch.DefaultQueueVmmqEnabled) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVmmqEnabled $vmSwitch.DefaultQueueVmmqEnabled
+}
+
+if ($switchObject.DefaultQueueVmmqQueuePairs -ne $vmSwitch.DefaultQueueVmmqQueuePairs) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVmmqQueuePairs $vmSwitch.DefaultQueueVmmqQueuePairs
+}
+
+if ($switchObject.DefaultQueueVrssEnabled -ne $vmSwitch.DefaultQueueVrssEnabled) {
+	Set-VMSwitch -Name $vmSwitch.Name -DefaultQueueVrssEnabled $vmSwitch.DefaultQueueVrssEnabled
 }
 `))
 
@@ -262,6 +325,7 @@ type deleteVMSwitchArgs struct {
 }
 
 var deleteVMSwitchTemplate = template.Must(template.New("DeleteVMSwitch").Parse(`
+$ErrorActionPreference = 'Stop'
 Get-VMSwitch | ?{$_.Name -eq '{{.Name}}'} | Remove-VMSwitch
 `))
 

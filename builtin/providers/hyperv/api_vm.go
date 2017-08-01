@@ -155,12 +155,20 @@ type createVMArgs struct {
 }
 
 var createVMTemplate = template.Must(template.New("CreateVM").Parse(`
+$ErrorActionPreference = 'Stop'
+Get-Vm | Out-Null
 $vm = '{{.VmJson}}' | ConvertFrom-Json
 $automaticCriticalErrorAction = [Microsoft.HyperV.PowerShell.CriticalErrorAction]$vm.AutomaticCriticalErrorAction
 $automaticStartAction = [Microsoft.HyperV.PowerShell.StartAction]$vm.AutomaticStartAction
 $automaticStopAction = [Microsoft.HyperV.PowerShell.StopAction]$vm.AutomaticStopAction
 $checkpointType = [Microsoft.HyperV.PowerShell.CheckpointType]$vm.CheckpointType
 $lockOnDisconnect = [Microsoft.HyperV.PowerShell.OnOffState]$vm.LockOnDisconnect
+
+$vmObject = Get-VM | ?{$_.Name -eq $vm.Name}
+
+if ($vmObject){
+	throw "VM already exists - $($vm.Name)"
+}
 
 New-Vm -Name $vm.Name -Generation $vm.Generation -MemoryStartupBytes $vm.MemoryStartupBytes
 Set-Vm -Name $vm.Name -GuestControlledCacheTypes:$vm.GuestControlledCacheTypes -LowMemoryMappedIoSpace $vm.LowMemoryMappedIoSpace -HighMemoryMappedIoSpace $vm.HighMemoryMappedIoSpace -ProcessorCount $vm.ProcessorCount -DynamicMemory:$vm.DynamicMemory -StaticMemory:$vm.StaticMemory -MemoryMinimumBytes $vm.MemoryMinimumBytes -MemoryMaximumBytes $vm.MemoryMaximumBytes -MemoryStartupBytes $vm.MemoryStartupBytes -AutomaticStartAction $automaticStartAction -AutomaticStopAction $automaticStopAction -AutomaticStartDelay $vm.AutomaticStartDelay -AutomaticCriticalErrorAction $automaticCriticalErrorAction -AutomaticCriticalErrorActionTimeout $vm.AutomaticCriticalErrorActionTimeout -LockOnDisconnect $lockOnDisconnect -Notes $vm.Notes -SnapshotFileLocation $vm.SnapshotFileLocation -SmartPagingFilePath $vm.SmartPagingFilePath -CheckpointType $checkpointType -AllowUnverifiedPaths $vm.AllowUnverifiedPaths
@@ -228,6 +236,7 @@ type getVMArgs struct {
 }
 
 var getVMTemplate = template.Must(template.New("GetVM").Parse(`
+$ErrorActionPreference = 'Stop'
 (Get-VM -name '{{.Name}}') | %{ @{
 	Name=$_.Name;
 	Generation=$_.Generation;
@@ -267,12 +276,20 @@ type updateVMArgs struct {
 }
 
 var updateVMTemplate = template.Must(template.New("UpdateVM").Parse(`
+$ErrorActionPreference = 'Stop'
+Get-Vm | Out-Null
 $vm = '{{.VmJson}}' | ConvertFrom-Json
 $automaticCriticalErrorAction = [Microsoft.HyperV.PowerShell.CriticalErrorAction]$vm.AutomaticCriticalErrorAction
 $automaticStartAction = [Microsoft.HyperV.PowerShell.StartAction]$vm.AutomaticStartAction
 $automaticStopAction = [Microsoft.HyperV.PowerShell.StopAction]$vm.AutomaticStopAction
 $checkpointType = [Microsoft.HyperV.PowerShell.CheckpointType]$vm.CheckpointType
 $lockOnDisconnect = [Microsoft.HyperV.PowerShell.OnOffState]$vm.LockOnDisconnect
+
+$vmObject = Get-VM | ?{$_.Name -eq $vm.Name}
+
+if (!$vmObject){
+	throw "VM does not exist - $($vm.Name)"
+}
 
 Set-Vm -Name $vm.Name -GuestControlledCacheTypes:$vm.GuestControlledCacheTypes -LowMemoryMappedIoSpace $vm.LowMemoryMappedIoSpace -HighMemoryMappedIoSpace $vm.HighMemoryMappedIoSpace -ProcessorCount $vm.ProcessorCount -DynamicMemory:$vm.DynamicMemory -StaticMemory:$vm.StaticMemory -MemoryMinimumBytes $vm.MemoryMinimumBytes -MemoryMaximumBytes $vm.MemoryMaximumBytes -MemoryStartupBytes $vm.MemoryStartupBytes -AutomaticStartAction $automaticStartAction -AutomaticStopAction $automaticStopAction -AutomaticStartDelay $vm.AutomaticStartDelay -AutomaticCriticalErrorAction $automaticCriticalErrorAction -AutomaticCriticalErrorActionTimeout $vm.AutomaticCriticalErrorActionTimeout -LockOnDisconnect $lockOnDisconnect -Notes $vm.Notes -SnapshotFileLocation $vm.SnapshotFileLocation -SmartPagingFilePath $vm.SmartPagingFilePath -CheckpointType $checkpointType -AllowUnverifiedPaths $vm.AllowUnverifiedPaths
 `))
@@ -339,6 +356,7 @@ type deleteVMArgs struct {
 }
 
 var deleteVMTemplate = template.Must(template.New("DeleteVM").Parse(`
+$ErrorActionPreference = 'Stop'
 Get-VM | ?{$_.Name -eq '{{.Name}}'} | Remove-VM
 `))
 
