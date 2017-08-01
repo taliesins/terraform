@@ -2,7 +2,18 @@ package powershell
 
 import (
 	"text/template"
+	"strings"
 )
+
+type executeCommandFromCommandLineTemplateOptions struct {
+	Powershell            string
+}
+
+var executeCommandFromCommandLineTemplate = template.Must(template.New("ExecuteCommandFromCommandLine").Funcs(template.FuncMap{
+	"escapeDoubleQuotes": func(textToEscape string) string {
+		return strings.Replace(textToEscape, `"`, `""`, -1)
+	},
+}).Parse(`powershell "{{escapeDoubleQuotes .Powershell}}"`))
 
 type executeCommandTemplateOptions struct {
 	Vars            string
@@ -89,7 +100,7 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
     </Actions>
 </Task>
 '@
-  $arguments = '/C powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptPath + '";exit $LastExitCode }" *> "' + $stdoutFile + '"'
+  $arguments = '/C powershell "& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&""' + $scriptPath + '"";exit $LastExitCode }" *> "' + $stdoutFile + '"'
   $taskXml = $taskXml.Replace("{arguments}", $arguments.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{username}", $username.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
   $taskXml = $taskXml.Replace("{taskDescription}", $taskDescription.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
