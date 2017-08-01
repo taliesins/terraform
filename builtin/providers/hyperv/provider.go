@@ -28,7 +28,7 @@ const (
 	DefaultScriptPath = "C:/Temp/terraform_%RAND%.cmd"
 
 	// DefaultTimeout is used if there is no timeout given
-	DefaultTimeoutString = ""
+	DefaultTimeoutString = "30s"
 )
 
 // Provider returns a terraform.ResourceProvider.
