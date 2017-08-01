@@ -11,7 +11,7 @@ type executeCommandFromCommandLineTemplateOptions struct {
 
 var executeCommandFromCommandLineTemplate = template.Must(template.New("ExecuteCommandFromCommandLine").Funcs(template.FuncMap{
 	"escapeDoubleQuotes": func(textToEscape string) string {
-		return strings.Replace(textToEscape, `"`, `^"`, -1)
+		return strings.Replace(textToEscape, `"`, `""`, -1)
 	},
 }).Parse(`powershell "{{escapeDoubleQuotes .Powershell}}"`))
 
@@ -20,7 +20,7 @@ type executeCommandTemplateOptions struct {
 	Path        	string
 }
 
-var executeCommandTemplate = template.Must(template.New("ExecuteCommand").Parse(`& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};{{.Vars}};&{{.Path}};exit $LastExitCode }`))
+var executeCommandTemplate = template.Must(template.New("ExecuteCommand").Parse(`& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};{{.Vars}};&"{{.Path}}";exit $LastExitCode }`))
 
 type elevatedCommandTemplateOptions struct {
 	User            		string
