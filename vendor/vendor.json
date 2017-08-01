@@ -90,6 +90,102 @@
 			"versionExact": "v8.0.0"
 		},
 		{
+			"checksumSHA1": "TgrN0l/E16deTlLYNt8wf66urSU=",
+			"path": "github.com/Azure/go-ntlmssp",
+			"revision": "e0b63eb299a769ea4b04dadfe530f6074b277afb"
+		},
+		{
+			"checksumSHA1": "ICScouhAqYHoJEpJlJMYg7EzgyY=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk",
+			"revision": "f62483cfb14defc08e6de8ae223fa75f9f95f264",
+			"revisionTime": "2016-10-04T17:17:29Z"
+		},
+		{
+			"checksumSHA1": "6PmfFhX5YwpzD7YVaC3tO8RV2NE=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/aa",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "b1mPi5zS0xRMOewslHGrMBv+Z1Y=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/alert",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "5xu6IMFKH9GNLSKRgVfIFQQ9Hnw=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/api",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "TWffSjF3LfoHD0fiZTWyNKXU8To=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/dc",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "1Wx5cs1C4EffZ2Wf/0XWJMAhNaQ=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/group",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "I5KBgGwEUB3qId3Uxy1TcEu/394=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/lb",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "wtKvlV1qjGhk9eB+zfnbnlGo4Ac=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/server",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "+dH0LCzco4D8rjXsLcFIkOht560=",
+			"comment": "0.0.2-27-gedd0930",
+			"path": "github.com/CenturyLinkCloud/clc-sdk/status",
+			"revision": "edd0930276e7f1a5f2cf3e7835b5dc42a3217669"
+		},
+		{
+			"checksumSHA1": "MV5JueYPwNkLZ+KNqmDcNDhsKi4=",
+			"path": "github.com/DreamItGetIT/statuscake",
+			"revision": "acc13ec021cd1e8a6ebb1d9035f513217f5c4562",
+			"revisionTime": "2017-04-10T11:34:45Z"
+		},
+		{
+			"checksumSHA1": "nomT+8bvze/Qmc0tK0r0mwgHV6M=",
+			"path": "github.com/Ensighten/udnssdk",
+			"revision": "9f1218928b30c6dec7f2c184c47286abc325deb9",
+			"revisionTime": "2016-06-13T20:05:45Z"
+		},
+		{
+			"checksumSHA1": "B+GonfgNwOAJMEe0WUHQGATRtMA=",
+			"path": "github.com/Microsoft/go-winio",
+			"revision": "562bb09f6612d9a4e91597184709d1cdba95af93",
+			"revisionTime": "2016-11-03T18:56:17Z"
+		},
+		{
+			"checksumSHA1": "iysTPYhDNP3x2reGLTMgNHw+iL0=",
+			"path": "github.com/PagerDuty/go-pagerduty",
+			"revision": "cc53abe550274c2dec666e7f44cefc9ee10e429d",
+			"revisionTime": "2017-03-09T00:45:39Z"
+		},
+		{
+			"checksumSHA1": "NX4v3cbkXAJxFlrncqT9yEUBuoA=",
+			"path": "github.com/PuerkitoBio/purell",
+			"revision": "0bcb03f4b4d0a9428594752bd2a3b9aa0a9d4bd4",
+			"revisionTime": "2016-11-15T02:49:42Z"
+		},
+		{
+			"checksumSHA1": "pvmScnaMFuAVLTxxOWjhGZBgPkg=",
+			"path": "github.com/PuerkitoBio/urlesc",
+			"revision": "5bd2802263f21d8788851d5305584c82a5c75d7e",
+			"revisionTime": "2016-07-26T15:08:25Z"
+		},
+		{
 			"checksumSHA1": "ly9VLPE9GKo2U7mnbZyjb2LDQ3w=",
 			"path": "github.com/Unknwon/com",
 			"revision": "28b053d5a2923b87ce8c5a08f3af779894a72758",
@@ -1554,6 +1650,18 @@
 			"checksumSHA1": "7iMOW6SxJFNH0/m1tjjCXVZl+Z8=",
 			"path": "github.com/lusis/go-artifactory/src/artifactory.v401",
 			"revision": "7e4ce345df825841661d1b3ffbb1327083d4a22f"
+		},
+		{
+			"checksumSHA1": "DlpjiTUHFFoU39yh4FIKS8g7L7A=",
+			"path": "github.com/masterzen/azure-sdk-for-go/core/http",
+			"revision": "ee4f0065d00cd12b542f18f5bc45799e88163b12",
+			"revisionTime": "2016-10-14T13:56:28Z"
+		},
+		{
+			"checksumSHA1": "uu+PYXYi4sSgXbRnGywIo7wG3JA=",
+			"path": "github.com/masterzen/azure-sdk-for-go/core/tls",
+			"revision": "ee4f0065d00cd12b542f18f5bc45799e88163b12",
+			"revisionTime": "2016-10-14T13:56:28Z"
 		},
 		{
 			"checksumSHA1": "yg57Q4J8Ob0LoYvqDxsWZ6AHffE=",
