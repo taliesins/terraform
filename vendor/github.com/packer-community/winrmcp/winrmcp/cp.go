@@ -162,14 +162,14 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 	var wg sync.WaitGroup
 	go func() {
 		wg.Add(1)
-		src := io.TeeReader(cmd.Stdout, stdOutBytes)
-		io.Copy(os.Stdout, src)
+		stdOutReader := io.TeeReader(cmd.Stdout, stdOutBytes)
+		io.Copy(os.Stdout, stdOutReader)
 		wg.Done()
 	}()
 	go func() {
 		wg.Add(1)
-		src := io.TeeReader(cmd.Stdout, stdErrorBytes)
-		io.Copy(os.Stderr, src)
+		stdErrReader := io.TeeReader(cmd.Stderr, stdErrorBytes)
+		io.Copy(os.Stderr, stdErrReader)
 		wg.Done()
 	}()
 
