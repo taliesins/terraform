@@ -11,7 +11,7 @@ type executeCommandFromCommandLineTemplateOptions struct {
 
 var executeCommandFromCommandLineTemplate = template.Must(template.New("ExecuteCommandFromCommandLine").Funcs(template.FuncMap{
 	"escapeDoubleQuotes": func(textToEscape string) string {
-		return strings.Replace(textToEscape, `"`, `""`, -1)
+		return strings.Replace(textToEscape, `"`, `\"`, -1)
 	},
 }).Parse(`powershell "{{escapeDoubleQuotes .Powershell}}"`))
 
@@ -105,7 +105,7 @@ function RunAsScheduledTask($username, $password, $taskName, $taskDescription, $
 </Task>
 '@
   $powershellToExecute = '& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference=''SilentlyContinue''};' + $vars + ';&"' + $scriptPath + '";exit $LastExitCode }'
-  $powershellToExecute = $powershellToExecute.Replace('"', '^"')
+  $powershellToExecute = $powershellToExecute.Replace('"', '\"')
 
   $arguments = '/C powershell "' + $powershellToExecute + '" *> "' + $stdoutFile + '"'
   $taskXml = $taskXml.Replace("{arguments}", $arguments.Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;').Replace('"', '&quot;').Replace('''', '&apos;'))
