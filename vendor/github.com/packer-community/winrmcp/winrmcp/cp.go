@@ -140,6 +140,7 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 				finally {
 					$writer.Close()
 				}
+			}
 			finally{
 				$reader.Close()
 			}
