@@ -156,30 +156,37 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 	}
 	defer cmd.Close()
 
-	commandOutputBytes := new(bytes.Buffer)
+	stdOutBytes := new(bytes.Buffer)
+	stdErrorBytes := new(bytes.Buffer)
 	var wg sync.WaitGroup
 	go func() {
 		wg.Add(1)
-		src := io.TeeReader(cmd.Stdout, commandOutputBytes)
+		src := io.TeeReader(cmd.Stdout, stdOutBytes)
 		io.Copy(os.Stdout, src)
 		wg.Done()
 	}()
 	go func() {
 		wg.Add(1)
-		io.Copy(os.Stderr, cmd.Stderr)
+		src := io.TeeReader(cmd.Stdout, stdErrorBytes)
+		io.Copy(os.Stderr, src)
 		wg.Done()
 	}()
 
 	cmd.Wait()
 	wg.Wait()
 
+	errorOutPut := stdErrorBytes.String()
+	stdOutPut := stdOutBytes.String()
+
 	if cmd.ExitCode() != 0 {
-		return "", fmt.Errorf("restore operation returned code=%d", cmd.ExitCode())
+		return "", fmt.Errorf("restore operation returned code=%d\nstderr:\n%s\nstdOut:\n%s", cmd.ExitCode(), errorOutPut, stdOutPut)
 	}
 
-	remoteAbsolutePath :=  commandOutputBytes.String()
+	if len(errorOutPut) > 0 {
+		return "", fmt.Errorf("restore operation returned \nstderr:\n%s\nstdOut:\n%s", errorOutPut, stdOutPut)
+	}
 
-	return remoteAbsolutePath, nil
+	return stdOutPut, nil
 }
 
 func cleanupContent(client *winrm.Client, filePath string) error {
