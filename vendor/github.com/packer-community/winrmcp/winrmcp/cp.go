@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/masterzen/winrm"
@@ -115,43 +116,48 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 
 	defer shell.Close()
 	script := fmt.Sprintf(`
-		$tmp_file_path = [System.IO.Path]::GetFullPath("%s")
-		$dest_file_path = [System.IO.Path]::GetFullPath("%s".Trim("'"))
+		if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};
+		$tmp_file_path = [System.IO.Path]::GetFullPath("%s");
+		$dest_file_path = [System.IO.Path]::GetFullPath("%s".Trim("'"));
 		if (Test-Path $dest_file_path) {
-			rm $dest_file_path | Out-Null
+			rm $dest_file_path | Out-Null;
 		}
 		else {
-			$dest_dir = ([System.IO.Path]::GetDirectoryName($dest_file_path))
-			New-Item -ItemType directory -Force -ErrorAction SilentlyContinue -Path $dest_dir | Out-Null
+			$dest_dir = ([System.IO.Path]::GetDirectoryName($dest_file_path));
+			New-Item -ItemType directory -Force -ErrorAction SilentlyContinue -Path $dest_dir | Out-Null;
 		}
 
 		if (Test-Path $tmp_file_path) {
-			$reader = [System.IO.File]::OpenText($tmp_file_path)
+			$reader = [System.IO.File]::OpenText($tmp_file_path);
 			try {
-				$writer = [System.IO.File]::OpenWrite($dest_file_path)
+				$writer = [System.IO.File]::OpenWrite($dest_file_path);
 				try {
 					for(;;) {
-						$base64_line = $reader.ReadLine()
-						if ($base64_line -eq $null) { break }
-						$bytes = [System.Convert]::FromBase64String($base64_line)
-						$writer.write($bytes, 0, $bytes.Length)
+						$base64_line = $reader.ReadLine();
+						if ($base64_line -eq $null) { break; }
+						$bytes = [System.Convert]::FromBase64String($base64_line);
+						$writer.write($bytes, 0, $bytes.Length);
 					}
 				}
 				finally {
-					$writer.Close()
+					$writer.Close();
 				}
 			}
 			finally{
-				$reader.Close()
+				$reader.Close();
 			}
 		} else {
-			echo $null > $dest_file_path
+			echo $null > $dest_file_path;
 		}
 
-		$dest_file_path
+		$dest_file_path;
 	`, fromPath, toPath)
 
-	cmd, err := shell.Execute(winrm.Powershell(script))
+	strings.Replace(script, "\n", "", -1)
+	strings.Replace(script, "\r", "", -1)
+
+	cmd, err := shell.Execute("powershell", script)
+
 	if err != nil {
 		return "", err
 	}
