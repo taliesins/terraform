@@ -49,16 +49,16 @@ func New(addr string, config *Config) (*Winrmcp, error) {
 	return &Winrmcp{client, config}, err
 }
 
-func (fs *Winrmcp) Copy(fromPath, toPath string) error {
+func (fs *Winrmcp) Copy(fromPath, toPath string) (remotesAbsolutePath string, err error) {
 	f, err := os.Open(fromPath)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Couldn't read file %s: %v", fromPath, err))
+		return "", errors.New(fmt.Sprintf("Couldn't read file %s: %v", fromPath, err))
 	}
 
 	defer f.Close()
 	fi, err := f.Stat()
 	if err != nil {
-		return errors.New(fmt.Sprintf("Couldn't stat file %s: %v", fromPath, err))
+		return "", errors.New(fmt.Sprintf("Couldn't stat file %s: %v", fromPath, err))
 	}
 
 	if !fi.IsDir() {
@@ -70,11 +70,14 @@ func (fs *Winrmcp) Copy(fromPath, toPath string) error {
 			toDir:   toPath,
 			fromDir: fromPath,
 		}
-		return filepath.Walk(fromPath, fw.copyFile)
+
+		err := filepath.Walk(fromPath, fw.copyFile)
+		remotesAbsolutePath = fw.remoteAbsoluteToDir
+		return remotesAbsolutePath, err
 	}
 }
 
-func (fs *Winrmcp) Write(toPath string, src io.Reader) error {
+func (fs *Winrmcp) Write(toPath string, src io.Reader) (string, error) {
 	return doCopy(fs.client, fs.config, src, winPath(toPath))
 }
 
@@ -83,10 +86,11 @@ func (fs *Winrmcp) List(remotePath string) ([]FileItem, error) {
 }
 
 type fileWalker struct {
-	client  *winrm.Client
-	config  *Config
-	toDir   string
-	fromDir string
+	client  				*winrm.Client
+	config  				*Config
+	toDir   				string
+	fromDir 				string
+	remoteAbsoluteToDir 	string
 }
 
 func (fw *fileWalker) copyFile(fromPath string, fi os.FileInfo, err error) error {
@@ -108,7 +112,15 @@ func (fw *fileWalker) copyFile(fromPath string, fi os.FileInfo, err error) error
 		return errors.New(fmt.Sprintf("Couldn't read file %s: %v", fromPath, err))
 	}
 
-	return doCopy(fw.client, fw.config, f, winPath(toPath))
+	remoteAbsolutePath, err := doCopy(fw.client, fw.config, f, winPath(toPath))
+
+	if (fw.remoteAbsoluteToDir == ""){
+		fromPath := filepath.Join(fromDir, relPath)
+		lengthOfRelativePath := len(fromPath) - len(fromDir)
+		fw.remoteAbsoluteToDir = remoteAbsolutePath[0:len(remoteAbsolutePath)-lengthOfRelativePath]
+	}
+
+	return err
 }
 
 func shouldUploadFile(fi os.FileInfo) bool {

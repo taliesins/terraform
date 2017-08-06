@@ -94,7 +94,7 @@ func generateElevatedRunner(comm *winrm.Communicator, elevatedUser string, eleva
 	return elevatedRemotePath, nil
 }
 
-func uploadScript(comm *winrm.Communicator, fileName string, command string) (path string, err error) {
+func uploadScript(comm *winrm.Communicator, fileName string, command string) (remoteAbsolutePath string, err error) {
 	tmpFile, err := ioutil.TempFile(os.TempDir(), fileName)
 	writer := bufio.NewWriter(tmpFile)
 	if _, err := writer.WriteString(command); err != nil {
@@ -112,15 +112,15 @@ func uploadScript(comm *winrm.Communicator, fileName string, command string) (pa
 	defer f.Close()
 	defer os.Remove(tmpFile.Name())
 
-	path = fmt.Sprintf(`%s\%s`, `$env:TEMP`, fileName)
+	remotePath := fmt.Sprintf(`%s\%s`, `$env:TEMP`, fileName)
 
-	log.Printf("Uploading shell wrapper for command from [%s] to [%s] ", tmpFile.Name(), path)
-	err = comm.UploadScript(path, f)
+	log.Printf("Uploading shell wrapper for command from [%s] to [%s] ", tmpFile.Name(), remotePath)
+	remoteAbsolutePath, err = comm.UploadScript(remotePath, f)
 	if err != nil {
 		return "", fmt.Errorf("Error uploading shell script: %s", err)
 	}
 
-	return path, nil
+	return remoteAbsolutePath, nil
 }
 
 //Run powers

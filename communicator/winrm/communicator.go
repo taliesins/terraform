@@ -174,26 +174,26 @@ func runCommand(shell *winrm.Shell, cmd *winrm.Command, rc *remote.Cmd) {
 }
 
 // Upload implementation of communicator.Communicator interface
-func (c *Communicator) Upload(path string, input io.Reader) error {
+func (c *Communicator) Upload(path string, input io.Reader) (remoteAbsolutePath string, err error) {
 	wcp, err := c.newCopyClient()
 	if err != nil {
-		return err
+		return "", err
 	}
 	log.Printf("Uploading file to '%s'", path)
 	return wcp.Write(path, input)
 }
 
 // UploadScript implementation of communicator.Communicator interface
-func (c *Communicator) UploadScript(path string, input io.Reader) error {
+func (c *Communicator) UploadScript(path string, input io.Reader) (remoteAbsolutePath string, err error) {
 	return c.Upload(path, input)
 }
 
 // UploadDir implementation of communicator.Communicator interface
-func (c *Communicator) UploadDir(dst string, src string) error {
+func (c *Communicator) UploadDir(dst string, src string) (remoteAbsolutePath string, err error) {
 	log.Printf("Uploading dir '%s' to '%s'", src, dst)
 	wcp, err := c.newCopyClient()
 	if err != nil {
-		return err
+		return "", err
 	}
 	return wcp.Copy(src, dst)
 }

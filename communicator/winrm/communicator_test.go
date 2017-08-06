@@ -109,7 +109,7 @@ func TestUpload(t *testing.T) {
 	}
 	defer c.Disconnect()
 
-	err = c.Upload("C:/Temp/terraform.cmd", bytes.NewReader([]byte("something")))
+	_, err = c.Upload("C:/Temp/terraform.cmd", bytes.NewReader([]byte("something")))
 	if err != nil {
 		t.Fatalf("error uploading file: %s", err)
 	}
