@@ -282,7 +282,7 @@ func (c *Communicator) Start(cmd *remote.Cmd) error {
 }
 
 // Upload implementation of communicator.Communicator interface
-func (c *Communicator) Upload(path string, input io.Reader) error {
+func (c *Communicator) Upload(path string, input io.Reader) (string, error) {
 	// The target directory and file for talking the SCP protocol
 	targetDir := filepath.Dir(path)
 	targetFile := filepath.Base(path)
@@ -313,15 +313,15 @@ func (c *Communicator) Upload(path string, input io.Reader) error {
 		return scpUploadFile(targetFile, input, w, stdoutR, size)
 	}
 
-	return c.scpSession("scp -vt "+targetDir, scpFunc)
+	return targetDir, c.scpSession("scp -vt "+targetDir, scpFunc)
 }
 
 // UploadScript implementation of communicator.Communicator interface
-func (c *Communicator) UploadScript(path string, input io.Reader) error {
+func (c *Communicator) UploadScript(path string, input io.Reader) (string, error) {
 	reader := bufio.NewReader(input)
 	prefix, err := reader.Peek(2)
 	if err != nil {
-		return fmt.Errorf("Error reading script: %s", err)
+		return "", fmt.Errorf("Error reading script: %s", err)
 	}
 
 	var script bytes.Buffer
@@ -330,8 +330,11 @@ func (c *Communicator) UploadScript(path string, input io.Reader) error {
 	}
 
 	script.ReadFrom(reader)
-	if err := c.Upload(path, &script); err != nil {
-		return err
+
+	remoteAbsolutePath, err := c.Upload(path, &script)
+
+	if err != nil {
+		return "", err
 	}
 
 	var stdout, stderr bytes.Buffer
@@ -341,22 +344,22 @@ func (c *Communicator) UploadScript(path string, input io.Reader) error {
 		Stderr:  &stderr,
 	}
 	if err := c.Start(cmd); err != nil {
-		return fmt.Errorf(
+		return "", fmt.Errorf(
 			"Error chmodding script file to 0777 in remote "+
 				"machine: %s", err)
 	}
 	cmd.Wait()
 	if cmd.ExitStatus != 0 {
-		return fmt.Errorf(
+		return "", fmt.Errorf(
 			"Error chmodding script file to 0777 in remote "+
 				"machine %d: %s %s", cmd.ExitStatus, stdout.String(), stderr.String())
 	}
 
-	return nil
+	return remoteAbsolutePath, nil
 }
 
 // UploadDir implementation of communicator.Communicator interface
-func (c *Communicator) UploadDir(dst string, src string) error {
+func (c *Communicator) UploadDir(dst string, src string) (string, error) {
 	log.Printf("Uploading dir '%s' to '%s'", src, dst)
 	scpFunc := func(w io.Writer, r *bufio.Reader) error {
 		uploadEntries := func() error {
@@ -382,7 +385,7 @@ func (c *Communicator) UploadDir(dst string, src string) error {
 		return uploadEntries()
 	}
 
-	return c.scpSession("scp -rvt "+dst, scpFunc)
+	return dst, c.scpSession("scp -rvt "+dst, scpFunc)
 }
 
 func (c *Communicator) newSession() (session *ssh.Session, err error) {

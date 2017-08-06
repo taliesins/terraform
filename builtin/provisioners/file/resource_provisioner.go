@@ -125,7 +125,7 @@ func copyFiles(comm communicator.Communicator, src, dst string) error {
 
 	// If we're uploading a directory, short circuit and do that
 	if info.IsDir() {
-		if err := comm.UploadDir(dst, src); err != nil {
+		if _, err := comm.UploadDir(dst, src); err != nil {
 			return fmt.Errorf("Upload failed: %v", err)
 		}
 		return nil
@@ -138,7 +138,7 @@ func copyFiles(comm communicator.Communicator, src, dst string) error {
 	}
 	defer f.Close()
 
-	err = comm.Upload(dst, f)
+	_, err = comm.Upload(dst, f)
 	if err != nil {
 		return fmt.Errorf("Upload failed: %v", err)
 	}

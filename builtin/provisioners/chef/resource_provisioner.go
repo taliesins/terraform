@@ -391,14 +391,14 @@ func validateFn(c *terraform.ResourceConfig) (ws []string, es []error) {
 func (p *provisioner) deployConfigFiles(o terraform.UIOutput, comm communicator.Communicator, confDir string) error {
 	// Copy the user key to the new instance
 	pk := strings.NewReader(p.UserKey)
-	if err := comm.Upload(path.Join(confDir, p.UserName+".pem"), pk); err != nil {
+	if _, err := comm.Upload(path.Join(confDir, p.UserName+".pem"), pk); err != nil {
 		return fmt.Errorf("Uploading user key failed: %v", err)
 	}
 
 	if p.SecretKey != "" {
 		// Copy the secret key to the new instance
 		s := strings.NewReader(p.SecretKey)
-		if err := comm.Upload(path.Join(confDir, secretKey), s); err != nil {
+		if _, err := comm.Upload(path.Join(confDir, secretKey), s); err != nil {
 			return fmt.Errorf("Uploading %s failed: %v", secretKey, err)
 		}
 	}
@@ -423,7 +423,7 @@ func (p *provisioner) deployConfigFiles(o terraform.UIOutput, comm communicator.
 	}
 
 	// Copy the client config to the new instance
-	if err = comm.Upload(path.Join(confDir, clienrb), &buf); err != nil {
+	if _, err = comm.Upload(path.Join(confDir, clienrb), &buf); err != nil {
 		return fmt.Errorf("Uploading %s failed: %v", clienrb, err)
 	}
 
@@ -452,7 +452,7 @@ func (p *provisioner) deployConfigFiles(o terraform.UIOutput, comm communicator.
 	}
 
 	// Copy the first-boot.json to the new instance
-	if err := comm.Upload(path.Join(confDir, firstBoot), bytes.NewReader(d)); err != nil {
+	if _, err := comm.Upload(path.Join(confDir, firstBoot), bytes.NewReader(d)); err != nil {
 		return fmt.Errorf("Uploading %s failed: %v", firstBoot, err)
 	}
 
@@ -469,7 +469,7 @@ func (p *provisioner) deployOhaiHints(o terraform.UIOutput, comm communicator.Co
 		defer f.Close()
 
 		// Copy the hint to the new instance
-		if err := comm.Upload(path.Join(hintDir, path.Base(hint)), f); err != nil {
+		if _, err := comm.Upload(path.Join(hintDir, path.Base(hint)), f); err != nil {
 			return fmt.Errorf("Uploading %s failed: %v", path.Base(hint), err)
 		}
 	}

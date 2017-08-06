@@ -204,7 +204,7 @@ func TestAccUploadFile(t *testing.T) {
 	content := []byte("this is the file content")
 	source := bytes.NewReader(content)
 	tmpFile := filepath.Join(tmpDir, "tempFile.out")
-	err = c.Upload(tmpFile, source)
+	_, err = c.Upload(tmpFile, source)
 	if err != nil {
 		t.Fatalf("error uploading file: %s", err)
 	}

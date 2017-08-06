@@ -188,7 +188,7 @@ func runScripts(
 
 		remotePath := comm.ScriptPath()
 		err = retryFunc(ctx, comm.Timeout(), func() error {
-			if err := comm.UploadScript(remotePath, script); err != nil {
+			if _, err := comm.UploadScript(remotePath, script); err != nil {
 				return fmt.Errorf("Failed to upload script: %v", err)
 			}
 
@@ -226,7 +226,7 @@ func runScripts(
 		// Upload a blank follow up file in the same path to prevent residual
 		// script contents from remaining on remote machine
 		empty := bytes.NewReader([]byte(""))
-		if err := comm.Upload(remotePath, empty); err != nil {
+		if _, err := comm.Upload(remotePath, empty); err != nil {
 			// This feature is best-effort.
 			log.Printf("[WARN] Failed to upload empty follow up script: %v", err)
 		}

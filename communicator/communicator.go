@@ -30,13 +30,13 @@ type Communicator interface {
 	Start(*remote.Cmd) error
 
 	// Upload is used to upload a single file
-	Upload(string, io.Reader) error
+	Upload(string, io.Reader) (string, error)
 
 	// UploadScript is used to upload a file as a executable script
-	UploadScript(string, io.Reader) error
+	UploadScript(string, io.Reader) (string, error)
 
 	// UploadDir is used to upload a directory
-	UploadDir(string, string) error
+	UploadDir(string, string) (string, error)
 }
 
 // New returns a configured Communicator or an error if the connection type is not supported
