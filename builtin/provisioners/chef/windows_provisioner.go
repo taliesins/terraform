@@ -51,7 +51,7 @@ func (p *provisioner) windowsInstallChefClient(o terraform.UIOutput, comm commun
 	content := fmt.Sprintf(installScript, p.Version, p.HTTPProxy, strings.Join(p.NOProxy, ","))
 
 	// Copy the script to the new instance
-	if err := comm.UploadScript(script, strings.NewReader(content)); err != nil {
+	if _, err := comm.UploadScript(script, strings.NewReader(content)); err != nil {
 		return fmt.Errorf("Uploading client.rb failed: %v", err)
 	}
 

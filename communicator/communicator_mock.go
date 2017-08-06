@@ -52,10 +52,10 @@ func (c *MockCommunicator) Start(r *remote.Cmd) error {
 }
 
 // Upload implementation of communicator.Communicator interface
-func (c *MockCommunicator) Upload(path string, input io.Reader) error {
+func (c *MockCommunicator) Upload(path string, input io.Reader) (string, error) {
 	f, ok := c.Uploads[path]
 	if !ok {
-		return fmt.Errorf("Path %q not found!", path)
+		return "", fmt.Errorf("Path %q not found!", path)
 	}
 
 	var buf bytes.Buffer
@@ -64,28 +64,28 @@ func (c *MockCommunicator) Upload(path string, input io.Reader) error {
 
 	f = strings.TrimSpace(f)
 	if f != content {
-		return fmt.Errorf("expected: %q\n\ngot: %q\n", f, content)
+		return "", fmt.Errorf("expected: %q\n\ngot: %q\n", f, content)
 	}
 
-	return nil
+	return path, nil
 }
 
 // UploadScript implementation of communicator.Communicator interface
-func (c *MockCommunicator) UploadScript(path string, input io.Reader) error {
+func (c *MockCommunicator) UploadScript(path string, input io.Reader) (string, error) {
 	c.Uploads = c.UploadScripts
 	return c.Upload(path, input)
 }
 
 // UploadDir implementation of communicator.Communicator interface
-func (c *MockCommunicator) UploadDir(dst string, src string) error {
+func (c *MockCommunicator) UploadDir(dst string, src string) (string, error) {
 	v, ok := c.UploadDirs[src]
 	if !ok {
-		return fmt.Errorf("Directory not found!")
+		return "", fmt.Errorf("Directory not found!")
 	}
 
 	if v != dst {
-		return fmt.Errorf("expected: %q\n\ngot: %q\n", v, dst)
+		return "", fmt.Errorf("expected: %q\n\ngot: %q\n", v, dst)
 	}
 
-	return nil
+	return dst, nil
 }
