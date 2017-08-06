@@ -153,8 +153,10 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 		$dest_file_path;
 	`, fromPath, toPath)
 
-	strings.Replace(script, "\n", "", -1)
-	strings.Replace(script, "\r", "", -1)
+	script = strings.Replace(script, "\n", "", -1)
+	script = strings.Replace(script, "\r", "", -1)
+	script = strings.Replace(script, "\t", "", -1)
+	script = strings.Replace(script, "\"", "\\\"", -1)
 
 	cmd, err := shell.Execute("powershell", script)
 
