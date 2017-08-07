@@ -157,6 +157,7 @@ func restoreContent(client *winrm.Client, fromPath, toPath string) (string, erro
 	script = strings.Replace(script, "\r", "", -1)
 	script = strings.Replace(script, "\t", "", -1)
 	script = strings.Replace(script, "\"", "\\\"", -1)
+	script = "\"" + script + "\""
 
 	cmd, err := shell.Execute("powershell", script)
 
