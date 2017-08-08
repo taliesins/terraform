@@ -186,10 +186,13 @@ func resourceHyperVMachineCreate(d *schema.ResourceData, meta interface{}) (err 
 	err = c.CreateVM(name, generation, allowUnverifiedPaths, automaticCriticalErrorAction, automaticCriticalErrorActionTimeout, automaticStartAction, automaticStartDelay, automaticStopAction, checkpointType, dynamicMemory, guestControlledCacheTypes, highMemoryMappedIoSpace, lockOnDisconnect, lowMemoryMappedIoSpace, memoryMaximumBytes, memoryMinimumBytes, memoryStartupBytes, notes, processorCount, smartPagingFilePath, snapshotFileLocation, staticMemory)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] created hyperv machine: %#v", d)
+		return err
 	}
 
-	return err
+	d.SetId(name)
+	log.Printf("[INFO][hyperv] created hyperv machine: %#v", d)
+
+	return  nil
 }
 
 func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err error) {
@@ -208,6 +211,12 @@ func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err er
 
 	if err != nil {
 		return err
+	}
+
+	if s.Name != name {
+		d.SetId("")
+		log.Printf("[INFO][hyperv] unable to read hyperv machine as it does not exist: %#v", name)
+		return nil
 	}
 
 	d.Set("generation", s.Generation)
@@ -233,8 +242,10 @@ func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err er
 	d.Set("static_memory", s.StaticMemory)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] read hyperv machine: %#v", d)
+		return err
 	}
+
+	log.Printf("[INFO][hyperv] read hyperv machine: %#v", d)
 
 	return nil
 }
@@ -276,10 +287,12 @@ func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err 
 	err = c.UpdateVM(name, allowUnverifiedPaths, automaticCriticalErrorAction, automaticCriticalErrorActionTimeout, automaticStartAction, automaticStartDelay, automaticStopAction, checkpointType, dynamicMemory, guestControlledCacheTypes, highMemoryMappedIoSpace, lockOnDisconnect, lowMemoryMappedIoSpace, memoryMaximumBytes, memoryMinimumBytes, memoryStartupBytes, notes, processorCount, smartPagingFilePath, snapshotFileLocation, staticMemory)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] updated hyperv machine: %#v", d)
+		return err
 	}
 
-	return err
+	log.Printf("[INFO][hyperv] updated hyperv machine: %#v", d)
+
+	return nil
 }
 
 func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err error) {
@@ -298,8 +311,9 @@ func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err 
 	err = c.DeleteVM(name)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] deleted hyperv machine: %#v", d)
+		return err
 	}
 
-	return err
+	log.Printf("[INFO][hyperv] deleted hyperv machine: %#v", d)
+	return nil
 }

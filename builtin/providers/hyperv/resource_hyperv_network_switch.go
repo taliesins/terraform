@@ -151,10 +151,13 @@ func resourceHyperVNetworkSwitchCreate(d *schema.ResourceData, meta interface{})
 	err = c.CreateVMSwitch(switchName, notes, allowManagementOS, embeddedTeamingEnabled, iovEnabled, packetDirectEnabled, bandwidthReservationMode, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] created hyperv switch: %#v", d)
+		return err
 	}
 
-	return err
+	d.SetId(switchName)
+	log.Printf("[INFO][hyperv] created hyperv switch: %#v", d)
+
+	return  nil
 }
 
 func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (err error) {
@@ -175,6 +178,12 @@ func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (
 		return err
 	}
 
+	if s.Name == switchName {
+		d.SetId("")
+		log.Printf("[INFO][hyperv] unable to read hyperv switch as it does not exist: %#v", switchName)
+		return nil
+	}
+
 	d.Set("notes", s.Notes)
 	d.Set("allow_management_os", s.AllowManagementOS)
 	d.Set("enable_embedded_teaming", s.EmbeddedTeamingEnabled)
@@ -191,8 +200,10 @@ func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (
 	d.Set("default_queue_vrss_enabled", s.DefaultQueueVrssEnabled)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] read hyperv switch: %#v", d)
+		return err
 	}
+
+	log.Printf("[INFO][hyperv] read hyperv switch: %#v", d)
 
 	return nil
 }
@@ -237,10 +248,12 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 	err = c.UpdateVMSwitch(switchName, notes, allowManagementOS, switchType, netAdapterInterfaceDescriptions, netAdapterNames, defaultFlowMinimumBandwidthAbsolute, defaultFlowMinimumBandwidthWeight, defaultQueueVmmqEnabled, defaultQueueVmmqQueuePairs, defaultQueueVrssEnabled)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] updated hyperv switch: %#v", d)
+		return err
 	}
 
-	return err
+	log.Printf("[INFO][hyperv] updated hyperv switch: %#v", d)
+
+	return nil
 }
 
 func resourceHyperVNetworkSwitchDelete(d *schema.ResourceData, meta interface{}) (err error) {
@@ -259,8 +272,9 @@ func resourceHyperVNetworkSwitchDelete(d *schema.ResourceData, meta interface{})
 	err = c.DeleteVMSwitch(switchName)
 
 	if err != nil {
-		log.Printf("[INFO][hyperv] deleted hyperv switch: %#v", d)
+		return err
 	}
 
-	return err
+	log.Printf("[INFO][hyperv] deleted hyperv switch: %#v", d)
+	return nil
 }
