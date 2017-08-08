@@ -6,7 +6,7 @@ import (
 )
 
 type executeCommandFromCommandLineTemplateOptions struct {
-	Powershell            string
+	Powershell	string
 }
 
 var executeCommandFromCommandLineTemplate = template.Must(template.New("ExecuteCommandFromCommandLine").Funcs(template.FuncMap{
@@ -16,20 +16,20 @@ var executeCommandFromCommandLineTemplate = template.Must(template.New("ExecuteC
 }).Parse(`powershell "{{escapeDoubleQuotes .Powershell}}"`))
 
 type executeCommandTemplateOptions struct {
-	Vars            string
-	Path        	string
+	Vars		string
+	Path		string
 }
 
 var executeCommandTemplate = template.Must(template.New("ExecuteCommand").Parse(`& { if (Test-Path variable:global:ProgressPreference){$ProgressPreference='SilentlyContinue'};{{.Vars}};&"{{.Path}}";exit $LastExitCode }`))
 
 type elevatedCommandTemplateOptions struct {
-	User            		string
-	Password        		string
-	TaskName        		string
-	TaskDescription 		string
+	User            			string
+	Password        			string
+	TaskName        			string
+	TaskDescription 			string
 	TaskExecutionTimeLimit 	string
-	Vars            		string
-	ScriptPath  			string
+	Vars            			string
+	ScriptPath  				string
 }
 
 var elevatedCommandTemplate = template.Must(template.New("ElevatedCommand").Funcs(template.FuncMap{
