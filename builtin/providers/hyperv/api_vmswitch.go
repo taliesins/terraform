@@ -184,7 +184,7 @@ type getVMSwitchArgs struct {
 
 var getVMSwitchTemplate = template.Must(template.New("GetVMSwitch").Parse(`
 $ErrorActionPreference = 'Stop'
-(Get-VMSwitch -name '{{.Name}}') | %{ @{
+$vmSwitch = Get-VMSwitch | ?{$_.Name -eq '{{.Name}}' } | %{ @{
 	Name=$_.Name;
 	Notes=$_.Notes;
 	AllowManagementOS=$_.AllowManagementOS;
@@ -194,13 +194,19 @@ $ErrorActionPreference = 'Stop'
 	BandwidthReservationMode=$_.BandwidthReservationMode;
 	SwitchType=$_.SwitchType;
 	NetAdapterInterfaceDescriptions=$_.NetAdapterInterfaceDescriptions;
-	NetAdapterNames=@(Get-NetAdapter -InterfaceDescription $_.NetAdapterInterfaceDescriptions | %{$_.Name});
+	NetAdapterNames=if($_.NetAdapterInterfaceDescriptions){@(Get-NetAdapter -InterfaceDescription $_.NetAdapterInterfaceDescriptions | %{$_.Name})}else{@()};
 	DefaultFlowMinimumBandwidthAbsolute=$_.DefaultFlowMinimumBandwidthAbsolute;
 	DefaultFlowMinimumBandwidthWeight=$_.DefaultFlowMinimumBandwidthWeight;
 	DefaultQueueVmmqEnabled=$_.DefaultQueueVmmqEnabled;
 	DefaultQueueVmmqQueuePairs=$_.DefaultQueueVmmqQueuePairs;
 	DefaultQueueVrssEnabled=$_.DefaultQueueVrssEnabled;
 }} | ConvertTo-Json
+
+if (!$vmSwitch) {
+	$vmSwitch = '{"NetAdapterNames":[]}'
+}
+
+$vmSwitch
 `))
 
 func (c *HypervClient) GetVMSwitch(name string) (result vmSwitch, err error) {

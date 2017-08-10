@@ -164,13 +164,7 @@ func resourceHyperVNetworkSwitchRead(d *schema.ResourceData, meta interface{}) (
 	log.Printf("[INFO][hyperv] reading hyperv switch: %#v", d)
 	c := meta.(*HypervClient)
 
-	switchName := ""
-
-	if v, ok := d.GetOk("name"); ok {
-		switchName = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
+	switchName := d.Id()
 
 	s, err := c.GetVMSwitch(switchName)
 
@@ -212,13 +206,7 @@ func resourceHyperVNetworkSwitchUpdate(d *schema.ResourceData, meta interface{})
 	log.Printf("[INFO][hyperv] updating hyperv switch: %#v", d)
 	c := meta.(*HypervClient)
 
-	switchName := ""
-
-	if v, ok := d.GetOk("name"); ok {
-		switchName = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
+	switchName := d.Id()
 
 	notes := (d.Get("notes")).(string)
 	allowManagementOS := (d.Get("allow_management_os")).(bool)

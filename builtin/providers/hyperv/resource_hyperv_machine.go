@@ -199,13 +199,7 @@ func resourceHyperVMachineRead(d *schema.ResourceData, meta interface{}) (err er
 	log.Printf("[INFO][hyperv] reading hyperv machine: %#v", d)
 	c := meta.(*HypervClient)
 
-	name := ""
-
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
+	name := d.Id()
 
 	s, err := c.GetVM(name)
 
@@ -254,13 +248,7 @@ func resourceHyperVMachineUpdate(d *schema.ResourceData, meta interface{}) (err 
 	log.Printf("[INFO][hyperv] updating hyperv machine: %#v", d)
 	c := meta.(*HypervClient)
 
-	name := ""
-
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
+	name := d.Id()
 
 	//generation := (d.Get("generation")).(int)
 	allowUnverifiedPaths := (d.Get("allow_unverified_paths")).(bool)
@@ -300,13 +288,7 @@ func resourceHyperVMachineDelete(d *schema.ResourceData, meta interface{}) (err 
 
 	c := meta.(*HypervClient)
 
-	name := ""
-
-	if v, ok := d.GetOk("name"); ok {
-		name = v.(string)
-	} else {
-		return fmt.Errorf("name argument is required")
-	}
+	name := d.Id()
 
 	err = c.DeleteVM(name)
 

@@ -237,7 +237,7 @@ type getVMArgs struct {
 
 var getVMTemplate = template.Must(template.New("GetVM").Parse(`
 $ErrorActionPreference = 'Stop'
-(Get-VM -name '{{.Name}}') | %{ @{
+$vm = Get-VM | ?{$_.Name -eq '{{.Name}}' } | %{ @{
 	Name=$_.Name;
 	Generation=$_.Generation;
 	AllowUnverifiedPaths=$_.AllowUnverifiedPaths;
@@ -261,6 +261,12 @@ $ErrorActionPreference = 'Stop'
 	SnapshotFileLocation=$_.SnapshotFileLocation;
 	StaticMemory=$_.StaticMemory;
 }} | ConvertTo-Json
+
+if (!$vm){
+	$vm = '{}'
+}
+
+$vm
 `))
 
 func (c *HypervClient) GetVM(name string) (result vm, err error) {
